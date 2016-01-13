@@ -78,7 +78,7 @@ Example:
            */
           transition: {
             type: String,
-            value: 'transform 300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+            value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
           }
         },
 
@@ -94,7 +94,6 @@ Example:
         // Element Lifecycle
         ready: function() {
           this._swipeComplete = false;
-          this._transitionProperty = 'transform';
         }, 
 
         attached: function() {
@@ -126,7 +125,7 @@ Example:
 
         _selectedPageChanged: function(selected) {
           // TODO PG: it should also be possible to switch imperatively...
-          this.async(this.notifyResize);
+          this.notifyResize();
         },
 
         _onTrack: function(event) {
@@ -153,7 +152,7 @@ Example:
         _trackEnd: function(trackData) {
           // The element is swiped away if it's moved halfway its total width.
           // TODO PG: take treshold into account!
-          this._swipeComplete = Math.abs(trackData.dx) > this._width / 2;
+          this._swipeComplete = Math.abs(trackData.dx) > this._width * this.threshold;
           this._direction = trackData.dx > 0;
           this._swipeEnd();
         },
@@ -178,7 +177,6 @@ Example:
 
         _animate: function(x) {
           var translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
-          console.log("translate: " + translate);
 
           this.transform(translate, this._leftCandidate);
           this.transform(translate, this.selectedItem);
@@ -187,9 +185,9 @@ Example:
 
         _swipeEnd: function() {
           // Restore the original transition;
-          this._leftCandidate.style.transition = this.transition;
-          this.selectedItem.style.transition = this.transition;
-          this._rightCandidate.style.transition = this.transition;
+          this._leftCandidate.style.transition = 'transform ' + this.transition;
+          this.selectedItem.style.transition = 'transform ' + this.transition;
+          this._rightCandidate.style.transition = 'transform ' + this.transition;
 
           if (this._swipeComplete) {
             // If the element is ready to be swiped away, then translate it to the full
