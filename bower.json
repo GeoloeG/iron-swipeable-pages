@@ -1,21 +1,37 @@
 {
   "name": "iron-swipeable-pages",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "authors": [
-    "Anonymous <anonymous@example.com>"
+    "Pascal Gula aka MeTaNoV <pascal.gula@gmail.com>"
   ],
-  "description": "An element providing a solution to no problem in particular.",
+  "description": "TODO",
   "keywords": [
     "web-component",
+    "web-components",
+    "web",
+    "component",
+    "components",
+    "custom",
+    "element",
     "polymer",
-    "seed"
+    "iron",
+    "page",
+    "pages",
+    "swipe",
+    "swipeable"
   ],
   "main": "iron-swipeable-pages.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/MeTaNoV/iron-swipeable-pages.git"
+  },
+  "license": "MIT",
   "homepage": "https://github.com/MeTaNoV/iron-swipeable-pages/",
   "ignore": [
     "/.*",
-    "/test/"
+    "/test/",
+    "/demo/"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
@@ -23,6 +39,7 @@
     "iron-selector": "polymerelements/iron-selector#^1.0.0"
   },
   "devDependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "web-component-tester": "^3.4.0"
   }
