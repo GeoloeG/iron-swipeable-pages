@@ -18,31 +18,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </head>
   <body unresolved>
 
-    <p>An example of <code>&lt;iron-swipeable-pages&gt;</code>:</p>
-
-    <p>Make words! <button id="saybtn">Say Something</button></p>
-    <p>Make lasers! <button id="laserbtn">Fire lasers</button></p>
-
-    <iron-swipeable-pages author='{"name": "Lord Meowser", "image": "http://lorempixel.com/g/300/200/cats/"}' fancy>
-      <h2>Hello iron-swipeable-pages</h2>
+    <iron-swipeable-pages selected="0">
+      <div>Hello 1</div>
+      <div>Hello 2</div>
+      <div>Hello 3</div>
     </iron-swipeable-pages>
-
-    <script>
-      var seedElement = document.querySelector('iron-swipeable-pages');
-
-      document.querySelector('#saybtn').addEventListener('click', function() {
-        alert(seedElement.sayHello('Hallo!'));
-      });
-
-      document.querySelector('#laserbtn').addEventListener('click', function() {
-        seedElement.fireLasers();
-      });
-
-      document.addEventListener("iron-swipeable-pages-lasers", function(e) {
-        console.log(e.detail.sound);
-      });
-
-    </script>
 
   </body>
 </html>

@@ -1,5 +1,8 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selectable.html">
+
 <!--
 An element providing a solution to no problem in particular.
 
@@ -20,12 +23,28 @@ Example:
 <dom-module id="iron-swipeable-pages">
   <template>
     <style>
-      :host {
+      :host, #container {
         display: block;
+        height: 100%;
+        width: 100%;
+      }
+      :host {
+        overflow: hidden;
+      }
+      #container {
+        overflow-x : hidden;
+        overflow-y: hidden;
+        background-color: green;
+        transform: translateZ(0);
+      }
+      #container ::content > * {
+        position: relative;
       }
     </style>
 
-    <content id="content"></content>
+    <div id="container" touch-action="pan-y">
+      <content id="content"></content>
+    </div>
   </template>
 
   <script>
@@ -39,37 +58,12 @@ Example:
 
       properties: {
         /**
-         * We make this property readonly so changing page only occurs when
-         * page are swiped or selectNext() or selectPrevious() is called.
+         * The value used to decide if a transition is effective and therefore
+         * if the page get swiped.
          */
-        selected: {
-          type: String,
-          notify: true
-        },
-
-        /**
-         * Describes the author of the element, but is really just an excuse to
-         * show off JSDoc annotations.
-         *
-         * @type {{name: string, image: string}}
-         */
-        author: {
-          type: Object,
-          // Use `value` to provide a default value for a property, by setting it
-          // on your element's prototype.
-          //
-          // If you provide a function, as we do here, Polymer will call that
-          // _per element instance_.
-          //
-          // We do that to ensure that each element gets its own copy of the
-          // value, rather than having it shared across all instances (via the
-          // prototype).
-          value: function() {
-            return {
-              name:  'Dimitri Glazkov',
-              image: 'http://addyosmani.com/blog/wp-content/uploads/2013/04/unicorn.jpg',
-            };
-          }
+        threshold: {
+          type: Number,
+          value: 0.3
         },
 
         /**
@@ -77,58 +71,39 @@ Example:
          */
         transition: {
           type: String,
-          value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+          value: 'transform 300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
         }
+      },
+
+      listeners: {
+        'iron-items-changed': '_onItemsChanged',
+        'track': '_onTrack',
+        'transitionend': '_onTransitionEnd'
       },
 
       // Element Lifecycle
 
       ready: function() {
-        this._transitionProperty = 'opacity, transform';
         this._swipeComplete = false;
         this._direction = '';
-      },
+      }, 
 
       attached: function() {
-        this._nodeObserver = Polymer.dom(this.$.content).observeNodes(
-            function(mutations) {
-              for (var i = 0; i < mutations.addedNodes.length; i++) {
-                this._addListeners(mutations.addedNodes[i]);
-              }
-              for (var i = 0; i < mutations.removedNodes.length; i++) {
-                this._removeListeners(mutations.removedNodes[i]);
-              }
-            }.bind(this));
-      },
-
-      _addListeners: function(node) {
-        if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.COMMENT_NODE)
-          return;
-        // Set up the animation.
-        node.style.transitionProperty = this._transitionProperty;
-        node.style.transition = this.transition;
-
-        this.listen(node, 'track', '_onTrack');
-        this.listen(node, 'transitionend', '_onTransitionEnd');
-      },
-
-      _removeListeners: function(node) {
-        if (node.nodeType === Node.TEXT_NODE)
-          return;
-        this.unlisten(node, 'track', '_onTrack');
-        this.unlisten(node, 'transitionend', '_onTransitionEnd');
-      },
-
-      detached: function() {
-        if (this._nodeObserver) {
-          Polymer.dom(this.$.content).unobserveNodes(this._nodeObserver);
-          this._nodeObserver = null;
-        }
+        
       },
 
       // Element Behavior
 
+      _onItemsChanged: function(event) {
+        // we should normally simply read the items length...
+        console.log("this.items.length: " + this.items.length);
+        // instead, look at the mutation details to update the count...
+
+        // try to setup an observer on the items array to see if it triggers...
+      },
+
       _onTrack: function(event) {
+        console.log("tracking");
         var target = event.currentTarget;
         var track = event.detail;
 
@@ -162,33 +137,9 @@ Example:
       _animate: function(x, target) {
         var direction = x > 0 ? 1 : -1;
 
-        // This is the total distance the animation will take place over.
-        var totalDistance = this._nodeWidth * this.widthRatio;
+        var translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
 
-        // Opacity distance overflow. `this._nodeWidth * this.opacityRate` is the
-        // total distance the element needs to travel to become completely
-        // transparent, and `x` is how much the element has already travelled.
-        var opaqueDistance = Math.max(0, Math.abs(x) - this._nodeWidth * this.opacityRate);
-        var opacity = Math.max(0, (totalDistance - opaqueDistance) / totalDistance);
-        target.style.opacity = opacity;
-
-        var translate, rotate;
-
-        if (this.swipeStyle === 'horizontal') {
-          translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
-          rotate = '';
-        } else {  // Default is assumed to be `curve`.
-          // Assume the element will be completely transparent at 90 degrees, so
-          // figure out the rotation and vertical displacement needed to
-          // achieve that.
-          var y = totalDistance - Math.sqrt(totalDistance * totalDistance - opaqueDistance * opaqueDistance);
-          var deg = (1 - opacity) * direction * 90;
-
-          translate = 'translate3d(' + x + 'px,' + y + 'px,0)';
-          rotate = ' rotate(' + deg + 'deg)';
-        }
-
-        this.transform(translate + rotate, target);
+        this.transform(translate, target);
       },
 
       _swipeEnd: function(target) {
@@ -198,22 +149,15 @@ Example:
         if (this._swipeComplete) {
           // If the element is ready to be swiped away, then translate it to the full
           // transparency distance.
-          var totalDistance = this._nodeWidth * this.widthRatio;
-          this._animate(this._direction ? totalDistance : -totalDistance, target);
+          this._animate(this._direction ? this._nodeWidth : -this._nodeWidth, target);
         } else {
           this._animate(0, target);
         }
       },
 
       _onTransitionEnd: function(event) {
-        var target = event.currentTarget;
-
-        if (this._swipeComplete && event.propertyName === 'opacity') {
-          Polymer.dom(this).removeChild(target);
-          this.fire('iron-swipe',
-              { direction: this._direction > 0 ? 'right' : 'left',
-                target:target
-              });
+        if (this._swipeComplete) {
+          // TODO PG: update selected!
         }
       }
     });
