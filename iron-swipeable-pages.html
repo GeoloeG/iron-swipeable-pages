@@ -120,11 +120,6 @@ the transition used, and the possibility of cycling. For more details, see below
           this._lastIndex = this._valueToIndex(this.selected);
         },
 
-        attached: function() {
-          // TODO PG: we need to update _width on resize()
-          this._width = this.offsetWidth;
-        },
-
         // Element Behavior
         _onItemsChanged: function(event) {
           var mutations = event.detail;
@@ -200,11 +195,11 @@ the transition used, and the possibility of cycling. For more details, see below
           // left candidate
           this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
           this._leftCandidate = this.items[ this._leftIndex];
-          this._initPage(this._leftCandidate, 'none', -this._width);
+          this._initPage(this._leftCandidate, 'none', -this.offsetWidth);
           // right candidate
           this._rightIndex = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
           this._rightCandidate = this.items[this._rightIndex];
-          this._initPage(this._rightCandidate, 'none', this._width);
+          this._initPage(this._rightCandidate, 'none', this.offsetWidth);
         },
 
         _animatePages: function(x) {
@@ -219,7 +214,7 @@ the transition used, and the possibility of cycling. For more details, see below
 
         _trackEnd: function(trackData) {
           // The element is swiped away if it's moved halfway its total width.
-          this._swipeComplete = Math.abs(trackData.dx) > this._width * this.threshold;
+          this._swipeComplete = Math.abs(trackData.dx) > this.offsetWidth * this.threshold;
           this._direction = trackData.dx > 0;
           this._swipeEnd();
         },
@@ -234,7 +229,7 @@ the transition used, and the possibility of cycling. For more details, see below
           if (this._swipeComplete) {
             // If the element is ready to be swiped away, then translate it to the full
             // transparency distance.
-            this._animatePages(this._direction ? this._width : -this._width);
+            this._animatePages(this._direction ? this.offsetWidth : -this.offsetWidth);
           } else {
             this._animatePages(0);
           }
@@ -301,12 +296,12 @@ the transition used, and the possibility of cycling. For more details, see below
             if (index < this._lastIndex) {
               // we translate to the right
               for (var i = index; i <= this._lastIndex; i++) {
-                this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._width*(i-this._lastIndex));
+                this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.offsetWidth*(i-this._lastIndex));
               }
             } else {
               // we translate to the left
               for (var j = this._lastIndex; j <= index; j++) {
-                this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._width*(j-this._lastIndex));
+                this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.offsetWidth*(j-this._lastIndex));
               }
             }
             // removing the iron-last-selectd class since swiping is configured
@@ -314,7 +309,7 @@ the transition used, and the possibility of cycling. For more details, see below
 
             // before animating, we need to be sure style are updated correctly
             this.async( function() {
-              this._animatePages((this._lastIndex - index) * this._width);
+              this._animatePages((this._lastIndex - index) * this.offsetWidth);
               this._lastIndex = this._valueToIndex(selected);
             }, 10);
           }
