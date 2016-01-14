@@ -14,6 +14,17 @@ Example:
       <div>Three</div>
     </iron-swipeable-pages>
 
+It is a good idea to disable text selection on any of the children that you
+want to be swiped:
+
+    .swipe {
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-user-select: none;
+      user-select: none;
+      cursor: default;
+    }
+
 @demo demo/index.html
 @hero hero.svg
 -->
@@ -31,12 +42,14 @@ Example:
       width: 100%;
       height: 100%;
     }
-    :host > ::content > :not(.iron-selected):not(.iron-swiping) {
+    :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
       display: none !important;
     }
 
-    :host > ::content > .iron-swiping {
+    :host > ::content > .iron-swiping * {
       pointer-events: none;
+      user-select: none;
+      cursor: default;
     }
   </style>
 
@@ -70,7 +83,7 @@ Example:
            */
           threshold: {
             type: Number,
-            value: 0.05
+            value: 0.3
           },
 
           /**
@@ -103,13 +116,13 @@ Example:
 
         // Element Lifecycle
         ready: function() {
-          console.log("boing...");
           this._swipeComplete = false;
+          // TODO PG: find a way to prevent the selected Observer before ready()...
           this._lastIndex = this._valueToIndex(this.selected);
-          // this._animatedPages = [];
         },
 
         attached: function() {
+          // TODO PG: we need to update _width on resize()
           this._width = this.offsetWidth;
         },
 
@@ -138,13 +151,9 @@ Example:
 
         // prepare the page for animation and add it to the list of pages to be animated
         _initPage: function(node, transition, left) {
-          var translate = 'translate3d(' + 0 + 'px,' + 0 + 'px,0)';
           node.style.left = left + "px";
-          console.log("left: " + left);
-          node.classList.add('iron-swiping');
-          node.style.transition = 'none';
-          this.transform(translate, node);
           node.style.transition = transition;
+          this.toggleClass('iron-swiping', true, node);
 
           this._animatedPages.push(node);
         },
@@ -166,22 +175,12 @@ Example:
           this._animatePages(trackData.dx);
         },
 
-        _trackMove: function(trackData) {
-          this._animatePages(trackData.dx);
-        },
-
-        _trackEnd: function(trackData) {
-          // The element is swiped away if it's moved halfway its total width.
-          this._swipeComplete = Math.abs(trackData.dx) > this._width * this.threshold;
-          this._direction = trackData.dx > 0;
-          this._swipeEnd();
-        },
-
         _setUpCandidatePages: function() {
           // reset the animated page list
           this._animatedPages = [];
           // selected page
           this._initPage(this.selectedItem, 'none', 0);
+          this.toggleClass('iron-last-selected', false, this.selectedItem);
           // left candidate
           this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
           this._leftCandidate = this.items[ this._leftIndex];
@@ -193,24 +192,26 @@ Example:
         },
 
         _animatePages: function(x) {
-          var translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
-
           for (var i = 0; i < this._animatedPages.length; i++) {
-            this.transform(translate, this._animatedPages[i]);
+            this.translate3d(x+'px', 0+'px', 0+'px', this._animatedPages[i]);
           }
         },
 
-        _computeTransition: function(factor) {
-          var result = 'transform ' +
-                 factor*this.transitionDuration + 'ms ' +
-                 this.transitionTimingFunction;
-          console.log(result);
-          return result;
+        _trackMove: function(trackData) {
+          this._animatePages(trackData.dx);
+        },
+
+        _trackEnd: function(trackData) {
+          // The element is swiped away if it's moved halfway its total width.
+          this._swipeComplete = Math.abs(trackData.dx) > this._width * this.threshold;
+          this._direction = trackData.dx > 0;
+          this._swipeEnd();
         },
 
         _swipeEnd: function() {
           // Restore the original transition
           for (var i = 0; i < this._animatedPages.length; i++) {
+            // TODO PG: be sure it is working on webkit safari
             this._animatedPages[i].style.transition = this._computeTransition(1);
           }
 
@@ -223,41 +224,53 @@ Example:
           }
         },
 
+        _computeTransition: function(factor) {
+          return 'transform ' +
+                 factor*this.transitionDuration + 'ms ' +
+                 this.transitionTimingFunction;
+        },
+
         _onTransitionEnd: function(event) {
           this.debounce('transition-end-callback', function() {
-            // TODO PG: night use debounce...
-            console.log("_onTransitionEnd");
-
-            // remove the iron-swiping class
-            for (var i = 0; i < this._animatedPages.length; i++) {
-              this._animatedPages[i].classList.remove('iron-swiping');
-            }
-
             if (this._swipeComplete) {
+              // if we swipped successfully, we update selected
               this.selected = this._direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
-            } else {
-              // ?!?
             }
-          }, 300);
+
+            // remove the iron-swiping class and transition
+            for (var i = 0; i < this._animatedPages.length; i++) {
+              this.toggleClass('iron-swiping', false, this._animatedPages[i]);
+              this._animatedPages[i].style.transition = 'none';
+              this.transform('none', this._animatedPages[i]);
+            }
+            // adding the iron-last-selectd class for the next selected change...
+            this.toggleClass('iron-last-selected', true, this._valueToItem(this.selected));
+            this.selectedItem.style.left = '0px';
+
+            this.async(function() {
+              var selectedPage = this.selectedItem;
+              this.resizerShouldNotify = function(element) {
+                return element == selectedPage;
+              };
+              this.notifyResize();
+            }, 5);
+          }, 100);
         },
 
         _onSelectedChanged: function(selected) {
+          // might happen at init of the component when first selected value is set and ready not called....
+          if (this._lastIndex === undefined) {
+            return;
+          }
+
           if (this._swipeComplete) {
-            // we just need to reset the flag, the transformation happened already
+            // we just need to reset the flag, the transformation happened already by swiping
             this._swipeComplete = false;
-            console.log("Selected changed by swiping!");
           } else {
-            console.log("Initiating transformation by modifying selected!");
             // reset the animated page list
             this._animatedPages = [];
             // in this case, selected has been modify w/o swiping, we need to apply the transformation
             var index = this._valueToIndex(this.selected);
-            console.log("index: " + index);
-            console.log("this._lastIndex: " + this._lastIndex);
-            if (this._lastIndex === undefined) {
-              // might happen at init of the component when first selected value is set
-              return;
-            }
             if (index < this._lastIndex) {
               // we translate to the right
               for (var i = index; i <= this._lastIndex; i++) {
@@ -269,12 +282,15 @@ Example:
                 this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._width*(j-this._lastIndex));
               }
             }
-            console.log("translating " + (this._lastIndex - index) * this._width);
-            this._animatePages((this._lastIndex - index) * this._width);
+            // removing the iron-last-selectd class since swiping is configured
+            this.toggleClass('iron-last-selected', false, this.items[this._lastIndex]);
+
+            // before animating, we need to be sure style are updated correctly
+            this.async( function() {
+              this._animatePages((this._lastIndex - index) * this._width);
+              this._lastIndex = this._valueToIndex(this.selected);
+            }, 10);
           }
-          // TODO PG: understand what exactly does notifyResize()...
-          this.notifyResize();
-          this._lastIndex = this._valueToIndex(this.selected);
         }
       });
     }());

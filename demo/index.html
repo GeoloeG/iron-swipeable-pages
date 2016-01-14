@@ -67,7 +67,7 @@
         <button on-click="_onNextClick">&gt;&gt;</button>
       </div>
 
-      <iron-swipeable-pages selected="[[selected]]">
+      <iron-swipeable-pages selected="{{selected}}">
         <div>Page 1</div>
         <div>Page 2</div>
         <div>Page 3</div>
@@ -82,11 +82,11 @@
       scope.selected = 0;
 
       scope._onPrevClick = function() {
-        this.selected = this.selected === 0 ? 4 : (this.selected - 1);
+        scope.selected = scope.selected === 0 ? 4 : (scope.selected - 1);
       };
 
       scope._onNextClick = function() {
-        this.selected = this.selected === 4 ? 0 : (this.selected + 1);
+        scope.selected = scope.selected === 4 ? 0 : (scope.selected + 1);
       };
 
     </script>
