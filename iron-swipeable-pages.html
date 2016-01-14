@@ -70,16 +70,26 @@ Example:
            */
           threshold: {
             type: Number,
-            value: 0.3
+            value: 0.05
           },
 
           /**
-           * The CSS transition applied while swiping.
+           * The CSS transition duration applied while swiping.
            */
-          transition: {
+          transitionDuration: {
+            type: Number,
+            value: 300
+          },
+
+          /**
+           * The CSS transition duration applied while swiping.
+           */
+          transitionTimingFunction: {
             type: String,
-            value: '300ms cubic-bezier(0.4, 0.0, 0.2, 1)'
+            value: 'cubic-bezier(0.4, 0.0, 0.2, 1)'
           }
+
+          // TODO PG: add an option to avoid cycling
         },
 
         listeners: {
@@ -88,19 +98,32 @@ Example:
         },
 
         observers: [
-          '_selectedPageChanged(selected)'
+          '_onSelectedChanged(selected)'
         ],
 
         // Element Lifecycle
         ready: function() {
+          console.log("boing...");
           this._swipeComplete = false;
-        }, 
+          this._lastIndex = this._valueToIndex(this.selected);
+          // this._animatedPages = [];
+        },
 
         attached: function() {
           this._width = this.offsetWidth;
         },
 
         // Element Behavior
+        _onItemsChanged: function(event) {
+          var mutations = event.detail;
+          for (var i = 0; i < mutations.addedNodes.length; i++) {
+            this._addPage(mutations.addedNodes[i]);
+          }
+          for (var j = 0; j < mutations.removedNodes.length; j++) {
+            this._removePage(mutations.removedNodes[j]);
+          }
+        },
+
         _addPage: function(page) {
             if (page.nodeType !== Node.ELEMENT_NODE)
               return;
@@ -113,19 +136,17 @@ Example:
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
         },
 
-        _onItemsChanged: function(event) {
-          var mutations = event.detail;
-          for (var i = 0; i < mutations.addedNodes.length; i++) {
-            this._addPage(mutations.addedNodes[i]);
-          }
-          for (var j = 0; j < mutations.removedNodes.length; j++) {
-            this._removePage(mutations.removedNodes[j]);
-          }
-        },
+        // prepare the page for animation and add it to the list of pages to be animated
+        _initPage: function(node, transition, left) {
+          var translate = 'translate3d(' + 0 + 'px,' + 0 + 'px,0)';
+          node.style.left = left + "px";
+          console.log("left: " + left);
+          node.classList.add('iron-swiping');
+          node.style.transition = 'none';
+          this.transform(translate, node);
+          node.style.transition = transition;
 
-        _selectedPageChanged: function(selected) {
-          // TODO PG: it should also be possible to switch imperatively...
-          this.notifyResize();
+          this._animatedPages.push(node);
         },
 
         _onTrack: function(event) {
@@ -141,73 +162,119 @@ Example:
         },
 
         _trackStart: function(trackData) {
-          this._setUpCandidateItems();
-          this._animate(trackData.dx);
+          this._setUpCandidatePages();
+          this._animatePages(trackData.dx);
         },
 
         _trackMove: function(trackData) {
-          this._animate(trackData.dx);
+          this._animatePages(trackData.dx);
         },
 
         _trackEnd: function(trackData) {
           // The element is swiped away if it's moved halfway its total width.
-          // TODO PG: take treshold into account!
           this._swipeComplete = Math.abs(trackData.dx) > this._width * this.threshold;
           this._direction = trackData.dx > 0;
           this._swipeEnd();
         },
 
-        _setUpCandidateItems: function() {
-          this._initPage(this.selectedItem, 0);
+        _setUpCandidatePages: function() {
+          // reset the animated page list
+          this._animatedPages = [];
+          // selected page
+          this._initPage(this.selectedItem, 'none', 0);
           // left candidate
           this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
-          this._leftCandidate = this.items[this._leftIndex];
-          this._initPage(this._leftCandidate, -this._width);
+          this._leftCandidate = this.items[ this._leftIndex];
+          this._initPage(this._leftCandidate, 'none', -this._width);
           // right candidate
           this._rightIndex = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
           this._rightCandidate = this.items[this._rightIndex];
-          this._initPage(this._rightCandidate, this._width);
+          this._initPage(this._rightCandidate, 'none', this._width);
         },
 
-        _initPage: function(node, leftOffset) {
-          node.style.transition = 'none';
-          node.style.left = leftOffset + "px";
-          node.classList.add('iron-swiping');
-        },
-
-        _animate: function(x) {
+        _animatePages: function(x) {
           var translate = 'translate3d(' + x + 'px,' + 0 + 'px,0)';
 
-          this.transform(translate, this._leftCandidate);
-          this.transform(translate, this.selectedItem);
-          this.transform(translate, this._rightCandidate);
+          for (var i = 0; i < this._animatedPages.length; i++) {
+            this.transform(translate, this._animatedPages[i]);
+          }
+        },
+
+        _computeTransition: function(factor) {
+          var result = 'transform ' +
+                 factor*this.transitionDuration + 'ms ' +
+                 this.transitionTimingFunction;
+          console.log(result);
+          return result;
         },
 
         _swipeEnd: function() {
-          // Restore the original transition;
-          this._leftCandidate.style.transition = 'transform ' + this.transition;
-          this.selectedItem.style.transition = 'transform ' + this.transition;
-          this._rightCandidate.style.transition = 'transform ' + this.transition;
+          // Restore the original transition
+          for (var i = 0; i < this._animatedPages.length; i++) {
+            this._animatedPages[i].style.transition = this._computeTransition(1);
+          }
 
           if (this._swipeComplete) {
             // If the element is ready to be swiped away, then translate it to the full
             // transparency distance.
-            this._animate(this._direction ? this._width : -this._width);
+            this._animatePages(this._direction ? this._width : -this._width);
           } else {
-            this._animate(0);
+            this._animatePages(0);
           }
         },
 
         _onTransitionEnd: function(event) {
-          this.selectedItem.classList.remove('iron-swiping');
-          this._leftCandidate.classList.remove('iron-swiping');
-          this._rightCandidate.classList.remove('iron-swiping');
+          this.debounce('transition-end-callback', function() {
+            // TODO PG: night use debounce...
+            console.log("_onTransitionEnd");
 
+            // remove the iron-swiping class
+            for (var i = 0; i < this._animatedPages.length; i++) {
+              this._animatedPages[i].classList.remove('iron-swiping');
+            }
+
+            if (this._swipeComplete) {
+              this.selected = this._direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
+            } else {
+              // ?!?
+            }
+          }, 300);
+        },
+
+        _onSelectedChanged: function(selected) {
           if (this._swipeComplete) {
-            this.selected = this._direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
+            // we just need to reset the flag, the transformation happened already
+            this._swipeComplete = false;
+            console.log("Selected changed by swiping!");
           } else {
-            // ?!?
+            console.log("Initiating transformation by modifying selected!");
+            // reset the animated page list
+            this._animatedPages = [];
+            // in this case, selected has been modify w/o swiping, we need to apply the transformation
+            var index = this._valueToIndex(this.selected);
+            console.log("index: " + index);
+            console.log("this._lastIndex: " + this._lastIndex);
+            if (this._lastIndex === undefined) {
+              // might happen at init of the component when first selected value is set
+              return;
+            }
+            if (index < this._lastIndex) {
+              // we translate to the right
+              for (var i = index; i <= this._lastIndex; i++) {
+                this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._width*(i-this._lastIndex));
+              }
+            } else {
+              // we translate to the left
+              for (var j = this._lastIndex; j <= index; j++) {
+                this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._width*(j-this._lastIndex));
+              }
+            }
+            console.log("translating " + (this._lastIndex - index) * this._width);
+            this._animatePages((this._lastIndex - index) * this._width);
           }
+          // TODO PG: understand what exactly does notifyResize()...
+          this.notifyResize();
+          this._lastIndex = this._valueToIndex(this.selected);
         }
       });
     }());
