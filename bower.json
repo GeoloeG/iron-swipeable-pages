@@ -1,10 +1,10 @@
 {
   "name": "iron-swipeable-pages",
-  "version": "0.1.0",
+  "version": "0.8.0",
   "authors": [
     "Pascal Gula aka MeTaNoV <pascal.gula@gmail.com>"
   ],
-  "description": "TODO",
+  "description": "Element that enables switching between different pages by swiping gesture",
   "keywords": [
     "web-component",
     "web-components",
@@ -18,7 +18,8 @@
     "page",
     "pages",
     "swipe",
-    "swipeable"
+    "swipeable",
+    "content"
   ],
   "main": "iron-swipeable-pages.html",
   "private": false,

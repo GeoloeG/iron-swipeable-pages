@@ -4,7 +4,8 @@
 <link rel="import" href="../iron-selector/iron-selectable.html">
 
 <!--
-An element providing a solution to no problem in particular.
+`iron-swipeable-pages` manages a set of pages and and provides the ability to switch
+between them by swiping gesture.
 
 Example:
 
@@ -14,16 +15,8 @@ Example:
       <div>Three</div>
     </iron-swipeable-pages>
 
-It is a good idea to disable text selection on any of the children that you
-want to be swiped:
-
-    .swipe {
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -webkit-user-select: none;
-      user-select: none;
-      cursor: default;
-    }
+Additionnally, you can specify the following properties regarding the sensitivity of the swipe,
+the transition used, and the possibility of cycling. For more details, see below.
 
 @demo demo/index.html
 @hero hero.svg
@@ -87,7 +80,15 @@ want to be swiped:
           },
 
           /**
-           * The CSS transition duration applied while swiping.
+           * Prevent cycling between first and last pages.
+           */
+          noCycle: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * The CSS transition duration applied.
            */
           transitionDuration: {
             type: Number,
@@ -95,14 +96,12 @@ want to be swiped:
           },
 
           /**
-           * The CSS transition duration applied while swiping.
+           * The CSS transition timing function applied.
            */
           transitionTimingFunction: {
             type: String,
             value: 'cubic-bezier(0.4, 0.0, 0.2, 1)'
           }
-
-          // TODO PG: add an option to avoid cycling
         },
 
         listeners: {
@@ -161,6 +160,11 @@ want to be swiped:
         _onTrack: function(event) {
           var track = event.detail;
 
+          if (this.noCycle && !this._canCycle(track)) {
+            // TODO PG: provide an animation to show the swiping blocking
+            return;
+          }
+
           if (track.state === 'start') {
             this._trackStart(track);
           } else if (track.state === 'track') {
@@ -168,6 +172,18 @@ want to be swiped:
           } else if (track.state === 'end') {
             this._trackEnd(track);
           }
+        },
+
+        _canCycle: function(trackData) {
+          var index = this._valueToIndex(this.selected);
+
+          if (index === 0 && trackData.dx > 0) {
+            return false;
+          }
+          if (index === this.items.length - 1 && trackData.dx < 0) {
+            return false;
+          }
+          return true;
         },
 
         _trackStart: function(trackData) {
@@ -234,6 +250,7 @@ want to be swiped:
           this.debounce('transition-end-callback', function() {
             if (this._swipeComplete) {
               // if we swipped successfully, we update selected
+              this._lastIndex = this._valueToIndex(this.selected);
               this.selected = this._direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
             }
 
@@ -262,6 +279,17 @@ want to be swiped:
           if (this._lastIndex === undefined) {
             return;
           }
+          var index = this._valueToIndex(selected);
+
+          // handing the no cycling case
+          if (this.noCycle) {
+            if ((this._lastIndex === 0 && index === this.items.length - 1) ||
+                (this._lastIndex === this.items.length - 1 && index === 0)) {
+              // we revert the change
+              this.selected = this._indexToValue(this._lastIndex);
+              return;
+            }
+          }
 
           if (this._swipeComplete) {
             // we just need to reset the flag, the transformation happened already by swiping
@@ -270,7 +298,6 @@ want to be swiped:
             // reset the animated page list
             this._animatedPages = [];
             // in this case, selected has been modify w/o swiping, we need to apply the transformation
-            var index = this._valueToIndex(this.selected);
             if (index < this._lastIndex) {
               // we translate to the right
               for (var i = index; i <= this._lastIndex; i++) {
@@ -288,7 +315,7 @@ want to be swiped:
             // before animating, we need to be sure style are updated correctly
             this.async( function() {
               this._animatePages((this._lastIndex - index) * this._width);
-              this._lastIndex = this._valueToIndex(this.selected);
+              this._lastIndex = this._valueToIndex(selected);
             }, 10);
           }
         }

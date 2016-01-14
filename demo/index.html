@@ -22,8 +22,14 @@
         @apply(--layout-vertical);
       }
 
-      .toolbar {
+      #toolbar {
+        background: var(--paper-grey-500);
+        @apply(--paper-font-headline);
         padding: 8px;
+      }
+
+      button {
+        margin: 8px;
       }
 
       iron-swipeable-pages {
@@ -62,12 +68,27 @@
   <body>
     <template is="dom-bind">
 
-      <div class="toolbar">
-        <button on-click="_onPrevClick">&lt;&lt;</button>
-        <button on-click="_onNextClick">&gt;&gt;</button>
+      <div id="toolbar">
+        <button on-click="_onPrevClick1">&lt;&lt;</button>
+        Cycling enabled
+        <button on-click="_onNextClick1">&gt;&gt;</button>
       </div>
 
-      <iron-swipeable-pages selected="{{selected}}">
+      <iron-swipeable-pages selected="{{selected1}}" threshold="0.1">
+        <div>Page 1</div>
+        <div>Page 2</div>
+        <div>Page 3</div>
+        <div>Page 4</div>
+        <div>Page 5</div>
+      </iron-swipeable-pages>
+
+      <div id="toolbar">
+        <button on-click="_onPrevClick2">&lt;&lt;</button>
+        Cycling disabled
+        <button on-click="_onNextClick2">&gt;&gt;</button>
+      </div>
+
+      <iron-swipeable-pages selected="{{selected2}}" threshold="0.1" no-cycle>
         <div>Page 1</div>
         <div>Page 2</div>
         <div>Page 3</div>
@@ -79,14 +100,23 @@
     <script>
 
       var scope = document.querySelector('template[is="dom-bind"]');
-      scope.selected = 0;
+      scope.selected1 = 0;
+      scope.selected2 = 0;
 
-      scope._onPrevClick = function() {
-        scope.selected = scope.selected === 0 ? 4 : (scope.selected - 1);
+      scope._onPrevClick1 = function() {
+        scope.selected1 = scope.selected1 === 0 ? 4 : (scope.selected1 - 1);
       };
 
-      scope._onNextClick = function() {
-        scope.selected = scope.selected === 4 ? 0 : (scope.selected + 1);
+      scope._onNextClick1 = function() {
+        scope.selected1 = scope.selected1 === 4 ? 0 : (scope.selected1 + 1);
+      };
+
+      scope._onPrevClick2 = function() {
+        scope.selected2 = scope.selected2 === 0 ? 4 : (scope.selected2 - 1);
+      };
+
+      scope._onNextClick2 = function() {
+        scope.selected2 = scope.selected2 === 4 ? 0 : (scope.selected2 + 1);
       };
 
     </script>
