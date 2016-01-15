@@ -92,7 +92,7 @@ the transition used, and the possibility of cycling. For more details, see below
            */
           transitionDuration: {
             type: Number,
-            value: 300
+            value: 250
           },
 
           /**
@@ -114,13 +114,16 @@ the transition used, and the possibility of cycling. For more details, see below
         ],
 
         // Element Lifecycle
+
         ready: function() {
-          this._swipeComplete = false;
-          // TODO PG: find a way to prevent the selected Observer before ready()...
+          this._completeSwipe = false;
+          this._transitionRunning = false;
           this._lastIndex = this._valueToIndex(this.selected);
+          this.toggleClass('iron-last-selected', true, this.items[this._lastIndex]);
         },
 
-        // Element Behavior
+        // Element page set up
+
         _onItemsChanged: function(event) {
           var mutations = event.detail;
           for (var i = 0; i < mutations.addedNodes.length; i++) {
@@ -134,29 +137,24 @@ the transition used, and the possibility of cycling. For more details, see below
         _addPage: function(page) {
             if (page.nodeType !== Node.ELEMENT_NODE)
               return;
+            // TODO PG: check for webkit 'webkitTransitionEnd'
             this.listen(page, 'transitionend', '_onTransitionEnd');
         },
 
         _removePage: function(page) {
             if (page.nodeType !== Node.ELEMENT_NODE)
               return;
+            // TODO PG: check for webkit 'webkitTransitionEnd'
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
         },
 
-        // prepare the page for animation and add it to the list of pages to be animated
-        _initPage: function(node, transition, left) {
-          node.style.left = left + "px";
-          node.style.transition = transition;
-          this.toggleClass('iron-swiping', true, node);
-
-          this._animatedPages.push(node);
-        },
+        // Element tracking 
 
         _onTrack: function(event) {
           var track = event.detail;
 
           if (this.noCycle && !this._canCycle(track)) {
-            // TODO PG: provide an animation to show the swiping blocking
+            // TODO PG: eventually provide an animation to show the swiping blocking
             return;
           }
 
@@ -169,29 +167,46 @@ the transition used, and the possibility of cycling. For more details, see below
           }
         },
 
-        _canCycle: function(trackData) {
-          var index = this._valueToIndex(this.selected);
-
-          if (index === 0 && trackData.dx > 0) {
-            return false;
-          }
-          if (index === this.items.length - 1 && trackData.dx < 0) {
-            return false;
-          }
-          return true;
-        },
-
         _trackStart: function(trackData) {
-          this._setUpCandidatePages();
+          this._setUpSwipePages();
           this._animatePages(trackData.dx);
         },
 
-        _setUpCandidatePages: function() {
+        _trackMove: function(trackData) {
+          this._animatePages(trackData.dx);
+        },
+
+        _trackEnd: function(trackData) {
+          // Activate transition
+          for (var i = 0; i < this._animatedPages.length; i++) {
+            // TODO PG: be sure it is working on webkit safari
+            this._animatedPages[i].style.transition = this._computeTransition(1);
+          }
+
+          // The element is swiped away if the swiping get passed the treshold.
+          this._completeSwipe = Math.abs(trackData.dx) > this.offsetWidth * this.threshold;
+          this._transitionRunning = true;
+          if (this._completeSwipe) {
+            var direction = trackData.dx > 0;
+            // we are swipping, therefore update selected
+            this.selected = direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
+            // moving the iron-last-selectd class for the next selected change...
+            this.classFollows('iron-last-selected', this._valueToItem(this.selected), this.items[this._lastIndex]);
+            this._lastIndex = this._valueToIndex(this.selected);
+            // trigger the animation in the proper direction
+            this._animatePages(direction ? this.offsetWidth : -this.offsetWidth);
+          } else {
+            this._animatePages(0);
+          }
+        },
+
+        // Element page management
+
+        _setUpSwipePages: function() {
           // reset the animated page list
           this._animatedPages = [];
           // selected page
           this._initPage(this.selectedItem, 'none', 0);
-          this.toggleClass('iron-last-selected', false, this.selectedItem);
           // left candidate
           this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
           this._leftCandidate = this.items[ this._leftIndex];
@@ -202,71 +217,46 @@ the transition used, and the possibility of cycling. For more details, see below
           this._initPage(this._rightCandidate, 'none', this.offsetWidth);
         },
 
+        // prepare the page for animation and add it to the list of pages to be animated
+        _initPage: function(page, transition, left) {
+          page.style.left = left + "px";
+          page.style.transition = transition;
+          this.toggleClass('iron-swiping', true, page);
+
+          this._animatedPages.push(page);
+        },
+
         _animatePages: function(x) {
           for (var i = 0; i < this._animatedPages.length; i++) {
             this.translate3d(x+'px', 0+'px', 0+'px', this._animatedPages[i]);
           }
         },
 
-        _trackMove: function(trackData) {
-          this._animatePages(trackData.dx);
-        },
-
-        _trackEnd: function(trackData) {
-          // The element is swiped away if it's moved halfway its total width.
-          this._swipeComplete = Math.abs(trackData.dx) > this.offsetWidth * this.threshold;
-          this._direction = trackData.dx > 0;
-          this._swipeEnd();
-        },
-
-        _swipeEnd: function() {
-          // Restore the original transition
+        // remove the iron-swiping class and transition
+        _resetPages: function() {
           for (var i = 0; i < this._animatedPages.length; i++) {
-            // TODO PG: be sure it is working on webkit safari
-            this._animatedPages[i].style.transition = this._computeTransition(1);
+            this.toggleClass('iron-swiping', false, this._animatedPages[i]);
+            this._animatedPages[i].style.transition = 'none';
+            this._animatedPages[i].style.left = '0px';
+            this.transform('none', this._animatedPages[i]);
           }
-
-          if (this._swipeComplete) {
-            // If the element is ready to be swiped away, then translate it to the full
-            // transparency distance.
-            this._animatePages(this._direction ? this.offsetWidth : -this.offsetWidth);
-          } else {
-            this._animatePages(0);
-          }
-        },
-
-        _computeTransition: function(factor) {
-          return 'transform ' +
-                 factor*this.transitionDuration + 'ms ' +
-                 this.transitionTimingFunction;
         },
 
         _onTransitionEnd: function(event) {
           this.debounce('transition-end-callback', function() {
-            if (this._swipeComplete) {
-              // if we swipped successfully, we update selected
-              this._lastIndex = this._valueToIndex(this.selected);
-              this.selected = this._direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
-            }
+            // reset pages state
+            this._resetPages();
+            this._transitionRunning = false;
 
-            // remove the iron-swiping class and transition
-            for (var i = 0; i < this._animatedPages.length; i++) {
-              this.toggleClass('iron-swiping', false, this._animatedPages[i]);
-              this._animatedPages[i].style.transition = 'none';
-              this.transform('none', this._animatedPages[i]);
-            }
-            // adding the iron-last-selectd class for the next selected change...
-            this.toggleClass('iron-last-selected', true, this._valueToItem(this.selected));
-            this.selectedItem.style.left = '0px';
-
+            // notifyResize
             this.async(function() {
               var selectedPage = this.selectedItem;
               this.resizerShouldNotify = function(element) {
                 return element == selectedPage;
               };
               this.notifyResize();
-            }, 5);
-          }, 100);
+            });
+          }, 50);
         },
 
         _onSelectedChanged: function(selected) {
@@ -286,34 +276,63 @@ the transition used, and the possibility of cycling. For more details, see below
             }
           }
 
-          if (this._swipeComplete) {
+          if (this._completeSwipe) {
             // we just need to reset the flag, the transformation happened already by swiping
-            this._swipeComplete = false;
+            this._completeSwipe = false;
           } else {
-            // reset the animated page list
-            this._animatedPages = [];
-            // in this case, selected has been modify w/o swiping, we need to apply the transformation
-            if (index < this._lastIndex) {
-              // we translate to the right
-              for (var i = index; i <= this._lastIndex; i++) {
-                this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.offsetWidth*(i-this._lastIndex));
-              }
+            // check if a transition is currently running
+            if (this._transitionRunning) {
+              // reset pages state and we don't trigger any new animation because lastIndex is not valid anymore
+              this._resetPages();
+              this._transitionRunning = false;
             } else {
-              // we translate to the left
-              for (var j = this._lastIndex; j <= index; j++) {
-                this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.offsetWidth*(j-this._lastIndex));
+              // reset the animated page list
+              this._animatedPages = [];
+              // in this case, selected has been modify w/o swiping, we need to apply the transformation
+              if (index < this._lastIndex) {
+                // we translate to the right
+                for (var i = index; i <= this._lastIndex; i++) {
+                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.offsetWidth*(i-this._lastIndex));
+                }
+              } else {
+                // we translate to the left
+                for (var j = this._lastIndex; j <= index; j++) {
+                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.offsetWidth*(j-this._lastIndex));
+                }
               }
+              // before animating, we need to be sure style are updated correctly
+              var lastIndex = this._lastIndex;
+              this.async( function() {
+                this._transitionRunning = true;
+                this._animatePages((lastIndex - index) * this.offsetWidth);
+              });
             }
-            // removing the iron-last-selectd class since swiping is configured
-            this.toggleClass('iron-last-selected', false, this.items[this._lastIndex]);
-
-            // before animating, we need to be sure style are updated correctly
-            this.async( function() {
-              this._animatePages((this._lastIndex - index) * this.offsetWidth);
-              this._lastIndex = this._valueToIndex(selected);
-            }, 10);
+            // moving the iron-last-selectd class since swiping is configured
+            this.classFollows('iron-last-selected', this._valueToItem(selected), this.items[this._lastIndex]);
+            // finally update lastIndex
+            this._lastIndex = this._valueToIndex(selected);
           }
-        }
+        },
+
+        // Element utility functions        
+        _canCycle: function(trackData) {
+          var index = this._valueToIndex(this.selected);
+
+          if (index === 0 && trackData.dx > 0) {
+            return false;
+          }
+          if (index === this.items.length - 1 && trackData.dx < 0) {
+            return false;
+          }
+          return true;
+        },
+
+        _computeTransition: function(factor) {
+          return 'transform ' +
+                 factor*this.transitionDuration + 'ms ' +
+                 this.transitionTimingFunction;
+        },
+
       });
     }());
   </script>

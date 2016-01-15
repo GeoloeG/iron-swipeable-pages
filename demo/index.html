@@ -22,7 +22,7 @@
         @apply(--layout-vertical);
       }
 
-      #toolbar {
+      #toolbar1, #toolbar2 {
         background: var(--paper-grey-500);
         @apply(--paper-font-headline);
         padding: 8px;
@@ -68,7 +68,7 @@
   <body>
     <template is="dom-bind">
 
-      <div id="toolbar">
+      <div id="toolbar1">
         <button on-click="_onPrevClick1">&lt;&lt;</button>
         Cycling enabled
         <button on-click="_onNextClick1">&gt;&gt;</button>
@@ -82,7 +82,7 @@
         <div>Page 5</div>
       </iron-swipeable-pages>
 
-      <div id="toolbar">
+      <div id="toolbar2">
         <button on-click="_onPrevClick2">&lt;&lt;</button>
         Cycling disabled
         <button on-click="_onNextClick2">&gt;&gt;</button>
