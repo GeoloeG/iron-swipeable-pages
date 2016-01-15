@@ -168,6 +168,11 @@ the transition used, and the possibility of cycling. For more details, see below
         },
 
         _trackStart: function(trackData) {
+          if (this._transitionRunning) {
+            // reset pages state
+            this._resetPages();
+            this._transitionRunning = false;
+          }
           this._setUpSwipePages();
           this._animatePages(trackData.dx);
         },
@@ -235,28 +240,26 @@ the transition used, and the possibility of cycling. For more details, see below
         // remove the iron-swiping class and transition
         _resetPages: function() {
           for (var i = 0; i < this._animatedPages.length; i++) {
-            this.toggleClass('iron-swiping', false, this._animatedPages[i]);
             this._animatedPages[i].style.transition = 'none';
             this._animatedPages[i].style.left = '0px';
             this.transform('none', this._animatedPages[i]);
+            this.toggleClass('iron-swiping', false, this._animatedPages[i]);
           }
         },
 
         _onTransitionEnd: function(event) {
-          this.debounce('transition-end-callback', function() {
-            // reset pages state
-            this._resetPages();
-            this._transitionRunning = false;
+          // reset pages state
+          this._resetPages();
+          this._transitionRunning = false;
 
-            // notifyResize
-            this.async(function() {
-              var selectedPage = this.selectedItem;
-              this.resizerShouldNotify = function(element) {
-                return element == selectedPage;
-              };
-              this.notifyResize();
-            });
-          }, 50);
+          // notifyResize
+          this.async(function() {
+            var selectedPage = this.selectedItem;
+            this.resizerShouldNotify = function(element) {
+              return element == selectedPage;
+            };
+            this.notifyResize();
+          });
         },
 
         _onSelectedChanged: function(selected) {
@@ -331,8 +334,7 @@ the transition used, and the possibility of cycling. For more details, see below
           return 'transform ' +
                  factor*this.transitionDuration + 'ms ' +
                  this.transitionTimingFunction;
-        },
-
+        }
       });
     }());
   </script>
