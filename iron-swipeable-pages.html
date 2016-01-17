@@ -39,9 +39,12 @@ the transition used, and the possibility of cycling. For more details, see below
       display: none !important;
     }
 
-    :host > ::content > * {
+    :host > ::content * {
       pointer-events: none;
-      user-select: none;
+      -webkit-user-select: none;  /* Chrome all / Safari all */
+      -moz-user-select: none;     /* Firefox all */
+      -ms-user-select: none;      /* IE 10+ */
+      user-select: none;          /* Likely future */
       cursor: default;
     }
   </style>
