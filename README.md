@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/MeTaNoV/iron-swipeable-pages.svg?branch=master)](https://travis-ci.org/MeTaNoV/iron-swipeable-pages)
 [![Dependency Status](https://gemnasium.com/MeTaNoV/iron-swipeable-pages.svg)](https://gemnasium.com/MeTaNoV/iron-swipeable-pages)
 
-`<iron-swipeable-pages>` is a TODO.
+`<iron-swipeable-pages>` manages a set of pages and and provides the ability to switch between them by swiping gesture.
 
 ## Demo
 
