@@ -39,7 +39,7 @@ the transition used, and the possibility of cycling. For more details, see below
       display: none !important;
     }
 
-    :host > ::content > .iron-swiping * {
+    :host > ::content > * {
       pointer-events: none;
       user-select: none;
       cursor: default;
@@ -148,7 +148,7 @@ the transition used, and the possibility of cycling. For more details, see below
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
         },
 
-        // Element tracking 
+        // Element tracking
 
         _onTrack: function(event) {
           var track = event.detail;
@@ -317,7 +317,7 @@ the transition used, and the possibility of cycling. For more details, see below
           }
         },
 
-        // Element utility functions        
+        // Element utility functions
         _canCycle: function(trackData) {
           var index = this._valueToIndex(this.selected);
 
