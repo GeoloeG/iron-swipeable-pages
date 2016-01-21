@@ -1,6 +1,6 @@
 {
   "name": "iron-swipeable-pages",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "authors": [
     "Pascal Gula aka MeTaNoV <pascal.gula@gmail.com>"
   ],
@@ -41,9 +41,9 @@
   },
   "devDependencies": {
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "web-component-tester": "^4.0.0",
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
-    "web-component-tester": "^4.0.0"
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0"
   }
 }

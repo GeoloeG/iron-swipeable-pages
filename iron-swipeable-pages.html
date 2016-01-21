@@ -4,7 +4,7 @@
 <link rel="import" href="../iron-selector/iron-selectable.html">
 
 <!--
-`iron-swipeable-pages` manages a set of pages and and provides the ability to switch
+`<iron-swipeable-pages>` manages a set of pages and and provides the ability to switch
 between them by swiping gesture.
 
 Example:
@@ -276,6 +276,8 @@ the transition used, and the possibility of cycling. For more details, see below
           if (this.noCycle) {
             if ((this._lastIndex === 0 && index === this.items.length - 1) ||
                 (this._lastIndex === this.items.length - 1 && index === 0)) {
+              // we simulate a ghost transition to avoid setting it to true when reverted
+              this._transitionRunning = true;
               // we revert the change
               this.selected = this._indexToValue(this._lastIndex);
               return;
