@@ -4,7 +4,7 @@
   "authors": [
     "Pascal Gula aka MeTaNoV <pascal.gula@gmail.com>"
   ],
-  "description": "Element that enables switching between different pages by swiping gesture",
+  "description": "[Polymer 1.x] Element that enables switching between different pages by swiping gesture.",
   "keywords": [
     "web-component",
     "web-components",
@@ -44,6 +44,6 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "paper-styles": "PolymerElements/paper-styles#^1.0.0",
-    "web-component-tester": "^3.4.0"
+    "web-component-tester": "^4.0.0"
   }
 }
