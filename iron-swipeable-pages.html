@@ -122,6 +122,7 @@ the transition used, and the possibility of cycling. For more details, see below
           this._completeSwipe = false;
           this._transitionRunning = false;
           this._lastIndex = this._valueToIndex(this.selected);
+          this._animatedPages = [];
           this.toggleClass('iron-last-selected', true, this.items[this._lastIndex]);
         },
 
