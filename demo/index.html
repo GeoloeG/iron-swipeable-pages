@@ -10,6 +10,8 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
     <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-tabs/paper-tab.html">
+    <link rel="import" href="../../paper-tabs/paper-tabs.html">
     <link rel="import" href="../../paper-styles/typography.html">
     <link rel="import" href="../../paper-styles/color.html">
 
@@ -96,12 +98,28 @@
         <div>Page 5</div>
       </iron-swipeable-pages>
 
+      <paper-tabs selected="{{selected3}}">
+        <paper-tab>Tab 1</paper-tab>
+        <paper-tab>Tab 2</paper-tab>
+        <paper-tab>Tab 3</paper-tab>
+        <paper-tab>Tab 4</paper-tab>
+        <paper-tab>Tab 5</paper-tab>
+      </paper-tabs>
+      <iron-swipeable-pages selected="{{selected3}}" threshold="0.1">
+        <div>Page 1</div>
+        <div>Page 2</div>
+        <div>Page 3</div>
+        <div>Page 4</div>
+        <div>Page 5</div>
+      </iron-swipeable-pages>
+
     </template>
     <script>
 
       var scope = document.querySelector('template[is="dom-bind"]');
       scope.selected1 = 0;
       scope.selected2 = 0;
+      scope.selected3 = 0;
 
       scope._onPrevClick1 = function() {
         scope.selected1 = scope.selected1 === 0 ? 4 : (scope.selected1 - 1);
