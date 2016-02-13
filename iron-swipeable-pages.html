@@ -83,7 +83,7 @@ the transition used, and the possibility of cycling. For more details, see below
           },
 
           /**
-           * Prevent cycling between first and last pages.
+           * Prevent cycling between first and last pages by swiping.
            */
           noCycle: {
             type: Boolean,
@@ -272,18 +272,6 @@ the transition used, and the possibility of cycling. For more details, see below
             return;
           }
           var index = this._valueToIndex(selected);
-
-          // handing the no cycling case
-          if (this.noCycle) {
-            if ((this._lastIndex === 0 && index === this.items.length - 1) ||
-                (this._lastIndex === this.items.length - 1 && index === 0)) {
-              // we simulate a ghost transition to avoid setting it to true when reverted
-              this._transitionRunning = true;
-              // we revert the change
-              this.selected = this._indexToValue(this._lastIndex);
-              return;
-            }
-          }
 
           if (this._completeSwipe) {
             // we just need to reset the flag, the transformation happened already by swiping
