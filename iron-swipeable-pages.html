@@ -30,6 +30,7 @@ want to be swiped:
     }
 
 @demo demo/index.html
+@demo demo/mobile.html
 @hero hero.svg
 -->
 
@@ -44,7 +45,6 @@ want to be swiped:
       position: absolute;
       top: 0;
       width: 100%;
-      height: 100%;
     }
     :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
       display: none !important;
@@ -126,6 +126,7 @@ want to be swiped:
           this._lastIndex = this._valueToIndex(this.selected);
           this._animatedPages = [];
           this.toggleClass('iron-last-selected', true, this.items[this._lastIndex]);
+          this.setScrollDirection('y');
         },
 
         // Element page set up
@@ -164,11 +165,13 @@ want to be swiped:
             return;
           }
 
-          if (track.state === 'start') {
+          if (track.state === 'start' && Math.abs(track.dy) < Math.abs(track.dx)) {
+            this._swipeStarted = true;
             this._trackStart(track);
-          } else if (track.state === 'track') {
+          } else if (track.state === 'track' && this._swipeStarted) {
             this._trackMove(track);
-          } else if (track.state === 'end') {
+          } else if (track.state === 'end' && this._swipeStarted) {
+            this._swipeStarted = false;
             this._trackEnd(track);
           }
         },
