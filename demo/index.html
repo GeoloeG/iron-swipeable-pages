@@ -38,6 +38,14 @@
         @apply(--layout-flex);
       }
 
+      iron-swipeable-pages > * {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
+        cursor: default;
+      }
+
       div {
         color: white;
         @apply(--layout-horizontal);
@@ -72,7 +80,7 @@
 
       <div id="toolbar1">
         <button on-click="_onPrevClick1">&lt;&lt;</button>
-        Cycling enabled
+        Cycling by swipe enabled
         <button on-click="_onNextClick1">&gt;&gt;</button>
       </div>
 
@@ -86,7 +94,7 @@
 
       <div id="toolbar2">
         <button on-click="_onPrevClick2">&lt;&lt;</button>
-        Cycling disabled
+        Cycling by swipe disabled (still working by selection)
         <button on-click="_onNextClick2">&gt;&gt;</button>
       </div>
 
