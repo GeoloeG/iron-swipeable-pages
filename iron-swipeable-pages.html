@@ -38,12 +38,9 @@ want to be swiped:
   <style>
     :host {
       display: block;
-      position: relative;
-      overflow-x: hidden;
     }
     :host > ::content > * {
       position: absolute;
-      top: 0;
       width: 100%;
     }
     :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
