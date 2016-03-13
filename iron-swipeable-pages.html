@@ -186,6 +186,7 @@ want to be swiped:
 
         _trackMove: function(trackData) {
           this._animatePages(trackData.dx);
+          this._moveNextPageIfNecessary(trackData.dx);
         },
 
         _trackEnd: function(trackData) {
@@ -209,6 +210,13 @@ want to be swiped:
             this._animatePages(direction ? this.offsetWidth : -this.offsetWidth);
           } else {
             this._animatePages(0);
+          }
+        },
+        
+        _moveNextPageIfNecessary: function(dx) {
+          if (this._leftCandidate === this._rightCandidate) {
+            var direction = dx > 0 ? -1 : 1;
+            this._rightCandidate.style.left = (direction * this.offsetWidth) + "px";
           }
         },
 
