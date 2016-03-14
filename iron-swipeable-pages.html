@@ -43,6 +43,7 @@ want to be swiped:
     :host > ::content > * {
       position: absolute;
       width: 100%;
+      will-change: left, transform;
     }
     :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
       display: none !important;
