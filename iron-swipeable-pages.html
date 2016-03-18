@@ -317,7 +317,7 @@ want to be swiped:
           this.async(function() {
             var selectedPage = this.selectedItem;
             this.resizerShouldNotify = function(element) {
-              return element == selectedPage;
+              return element == selectedPage || selectedPage.contains(element);
             };
             this.notifyResize();
           });
