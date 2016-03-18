@@ -213,7 +213,7 @@ want to be swiped:
             this._animatePages(0);
           }
         },
-        
+
         _moveNextPageIfNecessary: function(dx) {
           if (this._leftCandidate === this._rightCandidate) {
             var direction = dx > 0 ? -1 : 1;
@@ -267,15 +267,6 @@ want to be swiped:
           // reset pages state
           this._resetPages();
           this._transitionRunning = false;
-
-          // notifyResize
-          this.async(function() {
-            var selectedPage = this.selectedItem;
-            this.resizerShouldNotify = function(element) {
-              return element == selectedPage;
-            };
-            this.notifyResize();
-          });
         },
 
         _onSelectedChanged: function(selected) {
@@ -321,6 +312,15 @@ want to be swiped:
             // finally update lastIndex
             this._lastIndex = this._valueToIndex(selected);
           }
+
+          // notifyResize
+          this.async(function() {
+            var selectedPage = this.selectedItem;
+            this.resizerShouldNotify = function(element) {
+              return element == selectedPage;
+            };
+            this.notifyResize();
+          });
         },
 
         // Element utility functions
