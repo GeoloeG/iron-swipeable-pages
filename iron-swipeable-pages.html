@@ -75,6 +75,15 @@ want to be swiped:
           },
 
           /**
+           * Add extra padding to the offsetWidth while swiping
+           * Useful if the element is nested within other elements that enforce a padding
+           */
+          padding: {
+            type: Number,
+            value: 0
+          },
+
+          /**
            * The value used to decide if a transition is effective and therefore
            * if the page get swiped.
            */
@@ -126,6 +135,10 @@ want to be swiped:
           this._animatedPages = [];
           this.toggleClass('iron-last-selected', true, this.items[this._lastIndex]);
           this.setScrollDirection('y');
+        },
+
+        getOffsetWidth: function () {
+          return this.offsetWidth + (2 * this.padding);
         },
 
         // Element page set up
@@ -198,7 +211,7 @@ want to be swiped:
           }
 
           // The element is swiped away if the swiping get passed the treshold.
-          this._completeSwipe = Math.abs(trackData.dx) > this.offsetWidth * this.threshold;
+          this._completeSwipe = Math.abs(trackData.dx) > this.getOffsetWidth() * this.threshold;
           this._transitionRunning = true;
           if (this._completeSwipe) {
             var direction = trackData.dx > 0;
@@ -208,7 +221,7 @@ want to be swiped:
             this.classFollows('iron-last-selected', this._valueToItem(this.selected), this.items[this._lastIndex]);
             this._lastIndex = this._valueToIndex(this.selected);
             // trigger the animation in the proper direction
-            this._animatePages(direction ? this.offsetWidth : -this.offsetWidth);
+            this._animatePages(direction ? this.getOffsetWidth() : -this.getOffsetWidth());
           } else {
             this._animatePages(0);
           }
@@ -217,7 +230,7 @@ want to be swiped:
         _moveNextPageIfNecessary: function(dx) {
           if (this._leftCandidate === this._rightCandidate) {
             var direction = dx > 0 ? -1 : 1;
-            this._rightCandidate.style.left = (direction * this.offsetWidth) + "px";
+            this._rightCandidate.style.left = (direction * this.getOffsetWidth()) + "px";
           }
         },
 
@@ -231,11 +244,11 @@ want to be swiped:
           // left candidate
           this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
           this._leftCandidate = this.items[ this._leftIndex];
-          this._initPage(this._leftCandidate, 'none', -this.offsetWidth);
+          this._initPage(this._leftCandidate, 'none', -this.getOffsetWidth());
           // right candidate
           this._rightIndex = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
           this._rightCandidate = this.items[this._rightIndex];
-          this._initPage(this._rightCandidate, 'none', this.offsetWidth);
+          this._initPage(this._rightCandidate, 'none', this.getOffsetWidth());
         },
 
         // prepare the page for animation and add it to the list of pages to be animated
@@ -292,19 +305,19 @@ want to be swiped:
               if (index < this._lastIndex) {
                 // we translate to the right
                 for (var i = index; i <= this._lastIndex; i++) {
-                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.offsetWidth*(i-this._lastIndex));
+                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.getOffsetWidth()*(i-this._lastIndex));
                 }
               } else {
                 // we translate to the left
                 for (var j = this._lastIndex; j <= index; j++) {
-                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.offsetWidth*(j-this._lastIndex));
+                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.getOffsetWidth()*(j-this._lastIndex));
                 }
               }
               // before animating, we need to be sure style are updated correctly
               var lastIndex = this._lastIndex;
               this.async( function() {
                 this._transitionRunning = true;
-                this._animatePages((lastIndex - index) * this.offsetWidth);
+                this._animatePages((lastIndex - index) * this.getOffsetWidth());
               });
             }
             // moving the iron-last-selectd class since swiping is configured
