@@ -109,6 +109,14 @@ want to be swiped:
           },
 
           /**
+           * The maximum CSS transition duration applied.
+           */
+          maximumTransitionDuration: {
+            type: Number,
+            value: 0
+          },
+
+          /**
            * The CSS transition timing function applied.
            */
           transitionTimingFunction: {
@@ -350,9 +358,12 @@ want to be swiped:
         },
 
         _computeTransition: function(factor) {
-          return 'transform ' +
-                 factor*this.transitionDuration + 'ms ' +
-                 this.transitionTimingFunction;
+          var duration = factor * this.transitionDuration;
+          if (this.maximumTransitionDuration) {
+            duration = Math.min(this.maximumTransitionDuration, duration);
+          }
+
+          return 'transform ' + duration + 'ms ' + this.transitionTimingFunction;
         }
       });
     }());
