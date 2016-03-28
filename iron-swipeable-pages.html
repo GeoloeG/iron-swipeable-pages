@@ -261,6 +261,10 @@ want to be swiped:
 
         // prepare the page for animation and add it to the list of pages to be animated
         _initPage: function(page, transition, left) {
+          if (!page) {
+            return;
+          }
+
           page.style.left = left + "px";
           page.style.transition = transition;
           this.toggleClass('iron-swiping', true, page);
