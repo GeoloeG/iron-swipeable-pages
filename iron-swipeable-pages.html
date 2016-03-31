@@ -228,7 +228,7 @@ want to be swiped:
         },
 
         _moveNextPageIfNecessary: function(dx) {
-          if (this._leftCandidate === this._rightCandidate) {
+          if (this._leftCandidate && this._rightCandidate && this._leftCandidate === this._rightCandidate) {
             var direction = dx > 0 ? -1 : 1;
             this._rightCandidate.style.left = (direction * this.getOffsetWidth()) + "px";
           }
