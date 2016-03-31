@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <title>iron-swipeable-pages demo: declarative</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+
+    <link rel="import" href="../iron-swipeable-pages.html">
+
+    <style is="custom-style">
+      body {
+        margin: 0;
+        height: 100vh;
+        @apply(--layout-vertical);
+      }
+
+      iron-swipeable-pages {
+        @apply(--layout-flex);
+      }
+
+      iron-swipeable-pages > * {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
+        cursor: default;
+      }
+
+      div {
+        color: white;
+        font-size: 2rem;
+      }
+
+      #checkboxContainer {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-justified);
+      }
+
+      paper-checkbox:nth-child(1) {
+        --paper-checkbox-label-color: var(--paper-red-500);
+      }
+
+      paper-checkbox:nth-child(2) {
+        --paper-checkbox-label-color: var(--paper-blue-500);
+      }
+
+      paper-checkbox:nth-child(3) {
+        --paper-checkbox-label-color: var(--paper-orange-500);
+      }
+
+      paper-checkbox:nth-child(4) {
+        --paper-checkbox-label-color: var(--paper-green-500);
+      }
+
+      paper-checkbox:nth-child(5) {
+        --paper-checkbox-label-color: var(--paper-purple-500);
+      }
+
+      iron-swipeable-pages div:nth-child(1) {
+        background: var(--paper-red-500);
+      }
+
+      iron-swipeable-pages div:nth-child(2) {
+        background: var(--paper-blue-500);
+      }
+
+      iron-swipeable-pages div:nth-child(3) {
+        background: var(--paper-orange-500);
+      }
+
+      iron-swipeable-pages div:nth-child(4) {
+        background: var(--paper-green-500);
+      }
+
+      iron-swipeable-pages div:nth-child(5) {
+        background: var(--paper-purple-500);
+      }
+
+    </style>
+  </head>
+  <body>
+    <template is="dom-bind">
+      <div id="checkboxContainer"> 
+        <paper-checkbox checked="{{!page1}}"> page 1</paper-checkbox>
+        <paper-checkbox checked="{{!page2}}"> page 2</paper-checkbox>
+        <paper-checkbox checked="{{!page3}}"> page 3</paper-checkbox>
+        <paper-checkbox checked="{{!page4}}"> page 4</paper-checkbox>
+        <paper-checkbox checked="{{!page5}}"> page 5</paper-checkbox>
+      </div>
+      <iron-swipeable-pages selected="0" threshold="0.1">
+        <template is="dom-if" if="[[page1]]">
+          <div>Page 1</div>
+        </template>
+        <template is="dom-if" if="[[page2]]">
+          <div>Page 2</div>
+        </template>
+        <template is="dom-if" if="[[page3]]">
+          <div>Page 3</div>
+        </template>
+        <template is="dom-if" if="[[page4]]">
+          <div>Page 4</div>
+        </template>
+        <template is="dom-if" if="[[page5]]">
+          <div>Page 5</div>
+        </template>
+      </iron-swipeable-pages>
+    </template>
+  </body>
+</html>
