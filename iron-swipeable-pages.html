@@ -45,8 +45,11 @@ want to be swiped:
       width: 100%;
       will-change: left, transform;
     }
+    /* we cannot use `display=none` like for `iron-pages` to take into account the case of conditional pages */
     :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
-      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden;
     }
   </style>
 
@@ -72,6 +75,14 @@ want to be swiped:
           activateEvent: {
             type: String,
             value: null
+          },
+
+          // if some node are stamped conditionnally via `dom-if`, they should
+          // not be selectable to avoid swiping on blank pages.
+          // DO NOT CHANGE the default value
+          selectable: {
+            type: String,
+            value: ":not([style*='display']), :not([style*='none'])"
           },
 
           /**
@@ -122,7 +133,17 @@ want to be swiped:
           transitionTimingFunction: {
             type: String,
             value: 'cubic-bezier(0.4, 0.0, 0.2, 1)'
-          }
+          },
+
+          /**
+           * This option should be only relevant if you are using conditional pages, i.e.
+           * probably using `dom-if` or setting display: 'none' in certain conditions.
+           * A call to forceSynchronousItemUpdate is made before initiating any swiping action
+           */
+          checkDisplay: {
+            type: Boolean,
+            value: false
+          },
         },
 
         listeners: {
@@ -186,12 +207,20 @@ want to be swiped:
           }
 
           if (track.state === 'start' && Math.abs(track.dy) < Math.abs(track.dx)) {
+            // if we check the display state change of the pages
+            if (this.checkDisplay) {
+              this.forceSynchronousItemUpdate();
+            }
+            // if we don't have at least 2 items, no need to swipe...
+            if (this.items.length < 2) {
+              return;
+            }
             this._swipeStarted = true;
+
             this._trackStart(track);
           } else if (track.state === 'track' && this._swipeStarted) {
             this._trackMove(track);
           } else if (track.state === 'end' && this._swipeStarted) {
-            this._swipeStarted = false;
             this._trackEnd(track);
           }
         },
@@ -212,6 +241,9 @@ want to be swiped:
         },
 
         _trackEnd: function(trackData) {
+          if (!this._swipeStarted) {
+            return;
+          }
           // Activate transition
           for (var i = 0; i < this._animatedPages.length; i++) {
             // TODO PG: be sure it is working on webkit safari
@@ -288,6 +320,7 @@ want to be swiped:
           // reset pages state
           this._resetPages();
           this._transitionRunning = false;
+          this._swipeStarted = false;
         },
 
         _onSelectedChanged: function(selected) {
@@ -301,6 +334,10 @@ want to be swiped:
             // we just need to reset the flag, the transformation happened already by swiping
             this._completeSwipe = false;
           } else {
+            this._swipeStarted = true;
+            if (this.synchronous) {
+              this.forceSynchronousItemUpdate();
+            }
             // check if a transition is currently running
             if (this._transitionRunning) {
               // reset pages state and we don't trigger any new animation because lastIndex is not valid anymore
