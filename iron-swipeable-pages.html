@@ -29,8 +29,13 @@ want to be swiped:
       cursor: default;
     }
 
-@demo demo/index.html
-@demo demo/mobile.html
+Note: if you are using "conditional" pages, i.e. some content that are inside `dom-if` template,
+it might be useful to use the attribute `force-update` on the element, so that the list of
+available swipeable elements will be updated accordingly.
+
+@demo demo/index.html Standard Demo
+@demo demo/mobile.html Mobile Demo
+@demo demo/conditional.html Conditional Demo
 @hero hero.svg
 -->
 
@@ -45,8 +50,8 @@ want to be swiped:
       width: 100%;
       will-change: left, transform;
     }
-    /* we cannot use `display=none` like for `iron-pages` to take into account the case of conditional pages */
-    :host > ::content > :not(.iron-selected):not(.iron-last-selected):not(.iron-swiping) {
+    /* we cannot use `display=none` to take into account the case of conditional pages */
+    :host > ::content > :not(.iron-selected):not(.iron-swiping) {
       width: 0 !important;
       height: 0 !important;
       overflow: hidden;
@@ -74,6 +79,7 @@ want to be swiped:
           // handler immediately changes it back
           activateEvent: {
             type: String,
+            readOnly: true,
             value: null
           },
 
@@ -82,6 +88,7 @@ want to be swiped:
           // DO NOT CHANGE the default value
           selectable: {
             type: String,
+            readOnly: true,
             value: ":not([style*='display']), :not([style*='none'])"
           },
 
@@ -112,7 +119,7 @@ want to be swiped:
           },
 
           /**
-           * The CSS transition duration applied.
+           * The CSS transition duration applied swiping to next/previous page
            */
           transitionDuration: {
             type: Number,
@@ -120,7 +127,8 @@ want to be swiped:
           },
 
           /**
-           * The maximum CSS transition duration applied.
+           * The maximum global CSS transition duration applied if swiping involves more than one 
+           * page transition using selection instead of manual swiping.
            */
           maximumTransitionDuration: {
             type: Number,
@@ -138,9 +146,9 @@ want to be swiped:
           /**
            * This option should be only relevant if you are using conditional pages, i.e.
            * probably using `dom-if` or setting display: 'none' in certain conditions.
-           * A call to forceSynchronousItemUpdate is made before initiating any swiping action
+           * A call to forceSynchronousItemUpdate is made if any `dom-change` are happening
            */
-          checkDisplay: {
+          forceUpdate: {
             type: Boolean,
             value: false
           },
@@ -148,26 +156,16 @@ want to be swiped:
 
         listeners: {
           'iron-items-changed': '_onItemsChanged',
+          'dom-change': '_onDomChange',
+          'iron-deselect': '_onIronDeselectItem',
+          'iron-select': '_onIronSelectItem',
           'track': '_onTrack'
         },
-
-        observers: [
-          '_onSelectedChanged(selected)'
-        ],
 
         // Element Lifecycle
 
         ready: function() {
-          this._completeSwipe = false;
-          this._transitionRunning = false;
-          this._lastIndex = this._valueToIndex(this.selected);
-          this._animatedPages = [];
-          this.toggleClass('iron-last-selected', true, this.items[this._lastIndex]);
           this.setScrollDirection('y');
-        },
-
-        getOffsetWidth: function () {
-          return this.offsetWidth + (2 * this.padding);
         },
 
         // Element page set up
@@ -187,6 +185,7 @@ want to be swiped:
               return;
             // TODO PG: check for webkit 'webkitTransitionEnd'
             this.listen(page, 'transitionend', '_onTransitionEnd');
+            console.log("adding page!");
         },
 
         _removePage: function(page) {
@@ -194,10 +193,24 @@ want to be swiped:
               return;
             // TODO PG: check for webkit 'webkitTransitionEnd'
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
+            console.log("removing page!");
+        },
+
+        _onDomChange: function(event) {
+          // something might have change inside a template helper, e.g. `dom-if`
+          // so we should call forceSynchronousItemUpdate() to update the item list
+          // since it is not performance optimal, this is an opt-in option and we raise a 
+          // warning if this occurs and the option is not enabled
+          if (this.forceUpdate) {
+            this.forceSynchronousItemUpdate();
+          } else {
+            console.warn("iron-swipeable-pages: consider using the property forceUpdate since `dom-change` event has been triggered inside the component");
+          }
+          // TODO: see if we can handle the case where a currently selected element disappear
+          // and therefore force a swiping to the next available page...
         },
 
         // Element tracking
-
         _onTrack: function(event) {
           var track = event.detail;
 
@@ -207,10 +220,6 @@ want to be swiped:
           }
 
           if (track.state === 'start' && Math.abs(track.dy) < Math.abs(track.dx)) {
-            // if we check the display state change of the pages
-            if (this.checkDisplay) {
-              this.forceSynchronousItemUpdate();
-            }
             // if we don't have at least 2 items, no need to swipe...
             if (this.items.length < 2) {
               return;
@@ -229,15 +238,15 @@ want to be swiped:
           if (this._transitionRunning) {
             // reset pages state
             this._resetPages();
-            this._transitionRunning = false;
           }
           this._setUpSwipePages();
           this._animatePages(trackData.dx);
+          this._switchPageIfNecessary(trackData.dx);
         },
 
         _trackMove: function(trackData) {
           this._animatePages(trackData.dx);
-          this._moveNextPageIfNecessary(trackData.dx);
+          this._switchPageIfNecessary(trackData.dx);
         },
 
         _trackEnd: function(trackData) {
@@ -249,51 +258,96 @@ want to be swiped:
             // TODO PG: be sure it is working on webkit safari
             this._animatedPages[i].style.transition = this._computeTransition(1);
           }
+          this._transitionRunning = true;
 
           // The element is swiped away if the swiping get passed the treshold.
-          this._completeSwipe = Math.abs(trackData.dx) > this.getOffsetWidth() * this.threshold;
-          this._transitionRunning = true;
+          this._completeSwipe = Math.abs(trackData.dx) > this._getOffsetWidth() * this.threshold;
           if (this._completeSwipe) {
             var direction = trackData.dx > 0;
             // we are swipping, therefore update selected
-            this.selected = direction ? this._indexToValue(this._leftIndex) : this._indexToValue(this._rightIndex);
-            // moving the iron-last-selectd class for the next selected change...
-            this.classFollows('iron-last-selected', this._valueToItem(this.selected), this.items[this._lastIndex]);
-            this._lastIndex = this._valueToIndex(this.selected);
+            direction ? this.selectPrevious() : this.selectNext();
             // trigger the animation in the proper direction
-            this._animatePages(direction ? this.getOffsetWidth() : -this.getOffsetWidth());
+            this._animatePages(direction ? this._getOffsetWidth() : -this._getOffsetWidth());
           } else {
             this._animatePages(0);
           }
         },
 
-        _moveNextPageIfNecessary: function(dx) {
-          if (this._leftCandidate && this._rightCandidate && this._leftCandidate === this._rightCandidate) {
-            var direction = dx > 0 ? -1 : 1;
-            this._rightCandidate.style.left = (direction * this.getOffsetWidth()) + "px";
+        _onIronDeselectItem: function(event) {
+          this._lastIndex = this.indexOf(event.detail.item);
+        },
+
+        _onIronSelectItem: function(event) {
+          // might happen at init of the component when first selected value is set and ready not called....
+          if (this._lastIndex === undefined) {
+            return;
           }
+          var index = this.indexOf(event.detail.item);
+
+          if (this._completeSwipe) {
+            // we just need to reset the flag, the transformation happened already by swiping
+            this._completeSwipe = false;
+          } else {
+            // check if a transition is currently running
+            if (this._transitionRunning) {
+              // reset pages state and we don't trigger any new animation because lastIndex is not valid anymore
+              this._resetPages();
+            } else {
+              this._swipeStarted = true;
+              // reset the animated page list
+              this._animatedPages = [];
+              // in this case, selected has been modify w/o swiping, we need to apply the transformation
+              if (index < this._lastIndex) {
+                // we translate to the right
+                for (var i = index; i <= this._lastIndex; i++) {
+                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._getOffsetWidth()*(i-this._lastIndex));
+                }
+              } else {
+                // we translate to the left
+                for (var j = this._lastIndex; j <= index; j++) {
+                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._getOffsetWidth()*(j-this._lastIndex));
+                }
+              }
+              this._transitionRunning = true;
+
+              // before animating, we need to be sure style are updated correctly
+              var lastIndex = this._lastIndex;
+              this.async( function() {
+                this._animatePages((lastIndex - index) * this._getOffsetWidth());
+              });
+            }
+          }
+
+          // notifyResize
+          this.async(function() {
+            var selectedPage = this.selectedItem;
+            this.resizerShouldNotify = function(element) {
+              return element == selectedPage || selectedPage.contains(element);
+            };
+            this.notifyResize();
+          });
         },
 
         // Element page management
-
         _setUpSwipePages: function() {
           // reset the animated page list
           this._animatedPages = [];
           // selected page
           this._initPage(this.selectedItem, 'none', 0);
           // left candidate
-          this._leftIndex = (Number(this._valueToIndex(this.selected)) - 1 + this.items.length) % this.items.length;
-          this._leftCandidate = this.items[ this._leftIndex];
-          this._initPage(this._leftCandidate, 'none', -this.getOffsetWidth());
+          var leftIndex = (Number(this.indexOf(this.selectedItem)) - 1 + this.items.length) % this.items.length;
+          this._leftCandidate = this.items[leftIndex];
+          this._initPage(this._leftCandidate, 'none', -this._getOffsetWidth());
           // right candidate
-          this._rightIndex = (Number(this._valueToIndex(this.selected)) + 1) % this.items.length;
-          this._rightCandidate = this.items[this._rightIndex];
-          this._initPage(this._rightCandidate, 'none', this.getOffsetWidth());
+          var rightIndex = (Number(this.indexOf(this.selectedItem)) + 1) % this.items.length;
+          this._rightCandidate = this.items[rightIndex];
+          this._initPage(this._rightCandidate, 'none', this._getOffsetWidth());
         },
 
         // prepare the page for animation and add it to the list of pages to be animated
         _initPage: function(page, transition, left) {
           page.style.left = left + "px";
+          // TODO PG: be sure it is working on webkit safari
           page.style.transition = transition;
           this.toggleClass('iron-swiping', true, page);
 
@@ -306,6 +360,15 @@ want to be swiped:
           }
         },
 
+        // this function is useful if only 2 pages are available and we need to switch the next/previous page 
+        // on the left/right side depending on the direction of the swipe given with `dx`
+        _switchPageIfNecessary: function(dx) {
+          if (this._leftCandidate && this._rightCandidate && this._leftCandidate === this._rightCandidate) {
+            var direction = dx > 0 ? -1 : 1;
+            this._rightCandidate.style.left = (direction * this._getOffsetWidth()) + "px";
+          }
+        },
+
         // remove the iron-swiping class and transition
         _resetPages: function() {
           for (var i = 0; i < this._animatedPages.length; i++) {
@@ -314,71 +377,13 @@ want to be swiped:
             this.transform('none', this._animatedPages[i]);
             this.toggleClass('iron-swiping', false, this._animatedPages[i]);
           }
+          this._transitionRunning = false;
         },
 
         _onTransitionEnd: function(event) {
           // reset pages state
           this._resetPages();
-          this._transitionRunning = false;
           this._swipeStarted = false;
-        },
-
-        _onSelectedChanged: function(selected) {
-          // might happen at init of the component when first selected value is set and ready not called....
-          if (this._lastIndex === undefined) {
-            return;
-          }
-          var index = this._valueToIndex(selected);
-
-          if (this._completeSwipe) {
-            // we just need to reset the flag, the transformation happened already by swiping
-            this._completeSwipe = false;
-          } else {
-            this._swipeStarted = true;
-            if (this.synchronous) {
-              this.forceSynchronousItemUpdate();
-            }
-            // check if a transition is currently running
-            if (this._transitionRunning) {
-              // reset pages state and we don't trigger any new animation because lastIndex is not valid anymore
-              this._resetPages();
-              this._transitionRunning = false;
-            } else {
-              // reset the animated page list
-              this._animatedPages = [];
-              // in this case, selected has been modify w/o swiping, we need to apply the transformation
-              if (index < this._lastIndex) {
-                // we translate to the right
-                for (var i = index; i <= this._lastIndex; i++) {
-                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this.getOffsetWidth()*(i-this._lastIndex));
-                }
-              } else {
-                // we translate to the left
-                for (var j = this._lastIndex; j <= index; j++) {
-                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this.getOffsetWidth()*(j-this._lastIndex));
-                }
-              }
-              // before animating, we need to be sure style are updated correctly
-              var lastIndex = this._lastIndex;
-              this.async( function() {
-                this._transitionRunning = true;
-                this._animatePages((lastIndex - index) * this.getOffsetWidth());
-              });
-            }
-            // moving the iron-last-selectd class since swiping is configured
-            this.classFollows('iron-last-selected', this._valueToItem(selected), this.items[this._lastIndex]);
-            // finally update lastIndex
-            this._lastIndex = this._valueToIndex(selected);
-          }
-
-          // notifyResize
-          this.async(function() {
-            var selectedPage = this.selectedItem;
-            this.resizerShouldNotify = function(element) {
-              return element == selectedPage || selectedPage.contains(element);
-            };
-            this.notifyResize();
-          });
         },
 
         // Element utility functions
@@ -394,12 +399,15 @@ want to be swiped:
           return true;
         },
 
+        _getOffsetWidth: function () {
+          return this.offsetWidth + (2 * this.padding);
+        },
+
         _computeTransition: function(factor) {
           var duration = factor * this.transitionDuration;
           if (this.maximumTransitionDuration) {
             duration = Math.min(this.maximumTransitionDuration, duration);
           }
-
           return 'transform ' + duration + 'ms ' + this.transitionTimingFunction;
         }
       });
