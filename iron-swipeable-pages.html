@@ -127,7 +127,7 @@ available swipeable elements will be updated accordingly.
           },
 
           /**
-           * The maximum global CSS transition duration applied if swiping involves more than one 
+           * The maximum global CSS transition duration applied if swiping involves more than one
            * page transition using selection instead of manual swiping.
            */
           maximumTransitionDuration: {
@@ -199,7 +199,7 @@ available swipeable elements will be updated accordingly.
         _onDomChange: function(event) {
           // something might have change inside a template helper, e.g. `dom-if`
           // so we should call forceSynchronousItemUpdate() to update the item list
-          // since it is not performance optimal, this is an opt-in option and we raise a 
+          // since it is not performance optimal, this is an opt-in option and we raise a
           // warning if this occurs and the option is not enabled
           if (this.forceUpdate) {
             this.forceSynchronousItemUpdate();
@@ -234,6 +234,10 @@ available swipeable elements will be updated accordingly.
           }
         },
 
+        _preventTouchMove: function (e) {
+          return e && e.preventDefault();
+        },
+
         _trackStart: function(trackData) {
           if (this._transitionRunning) {
             // reset pages state
@@ -242,6 +246,9 @@ available swipeable elements will be updated accordingly.
           this._setUpSwipePages();
           this._animatePages(trackData.dx);
           this._switchPageIfNecessary(trackData.dx);
+
+          // Prevent regular touchmove event (disables vertical scroll)
+          window.addEventListener('touchmove', this._preventTouchMove);
         },
 
         _trackMove: function(trackData) {
@@ -271,6 +278,9 @@ available swipeable elements will be updated accordingly.
           } else {
             this._animatePages(0);
           }
+
+          // Enable regular touchmove event (enables vertical scroll again)
+          window.removeEventListener('touchmove', this._preventTouchMove);
         },
 
         _onIronDeselectItem: function(event) {
@@ -360,7 +370,7 @@ available swipeable elements will be updated accordingly.
           }
         },
 
-        // this function is useful if only 2 pages are available and we need to switch the next/previous page 
+        // this function is useful if only 2 pages are available and we need to switch the next/previous page
         // on the left/right side depending on the direction of the swipe given with `dx`
         _switchPageIfNecessary: function(dx) {
           if (this._leftCandidate && this._rightCandidate && this._leftCandidate === this._rightCandidate) {
