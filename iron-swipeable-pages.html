@@ -185,14 +185,14 @@ available swipeable elements will be updated accordingly.
         _addPage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
-            // TODO PG: check for webkit 'webkitTransitionEnd'
+            this.listen(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.listen(page, 'transitionend', '_onTransitionEnd');
         },
 
         _removePage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
-            // TODO PG: check for webkit 'webkitTransitionEnd'
+            this.unlisten(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
         },
 
@@ -213,7 +213,6 @@ available swipeable elements will be updated accordingly.
           var track = event.detail;
 
           if (this.noCycle && !this._canCycle(track)) {
-            // TODO PG: eventually provide an animation to show the swiping blocking
             return;
           }
 
@@ -255,7 +254,7 @@ available swipeable elements will be updated accordingly.
           }
           // Activate transition
           for (var i = 0; i < this._animatedPages.length; i++) {
-            // TODO PG: be sure it is working on webkit safari
+            this._animatedPages[i].style.webkitTransition = this._computeTransition(1);
             this._animatedPages[i].style.transition = this._computeTransition(1);
           }
           this._transitionRunning = true;
@@ -356,7 +355,7 @@ available swipeable elements will be updated accordingly.
             return;
           }
           page.style.left = left + "px";
-          // TODO PG: be sure it is working on webkit safari
+          page.style.webkitTransition = transition;
           page.style.transition = transition;
           this.toggleClass('iron-swiping', true, page);
 
