@@ -36,6 +36,7 @@ available swipeable elements will be updated accordingly.
 @demo demo/index.html Standard Demo
 @demo demo/mobile.html Mobile Demo
 @demo demo/conditional.html Conditional Demo
+@demo demo/repeat.html Configurable Repeat Demo
 @hero hero.svg
 -->
 
@@ -166,6 +167,7 @@ available swipeable elements will be updated accordingly.
 
         ready: function() {
           this.setScrollDirection('y');
+          this._animatedPages = [];
         },
 
         // Element page set up

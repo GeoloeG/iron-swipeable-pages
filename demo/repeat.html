@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <title>iron-swipeable-pages demo: configurable</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-tabs/paper-tab.html">
+    <link rel="import" href="../../paper-tabs/paper-tabs.html">
+    <link rel="import" href="../../paper-input/paper-input.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../dom-repeat-n/dom-repeat-n.html">
+
+    <link rel="import" href="../iron-swipeable-pages.html">
+
+    <style is="custom-style">
+      body {
+        overflow: hidden;
+        @apply(--layout-fullbleed);
+        @apply(--layout-vertical);
+      }
+
+      iron-swipeable-pages {
+        @apply(--layout-flex);
+      }
+
+      iron-swipeable-pages > * {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
+        cursor: default;
+        height: 100%;
+      }
+
+      div {
+        color: white;
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        @apply(--paper-font-display4);
+      }
+
+      div:nth-child(5n+1) {
+        background: var(--paper-red-500);
+      }
+
+      div:nth-child(5n+2) {
+        background: var(--paper-blue-500);
+      }
+
+      div:nth-child(5n+3) {
+        background: var(--paper-orange-500);
+      }
+
+      div:nth-child(5n+4) {
+        background: var(--paper-green-500);
+      }
+
+      div:nth-child(5n) {
+        background: var(--paper-purple-500);
+      }
+
+    </style>
+  </head>
+  <body>
+    <template is="dom-bind">
+
+      <paper-input label="Number of pages" type="number" value="{{initCount}}"></paper-input>
+
+      <paper-tabs selected="{{selected}}">
+        <template is="dom-repeat-n" count="[[_computeCount(initCount)]]">
+          <paper-tab>Tab [[index]]</paper-tab>
+        </template>
+      </paper-tabs>
+      <iron-swipeable-pages selected="{{selected}}" threshold="0.1">
+        <template is="dom-repeat-n" count="[[_computeCount(initCount)]]">
+          <div>Page [[index]]</div>
+        </template>
+      </iron-swipeable-pages>
+
+    </template>
+    <script>
+
+      var scope = document.querySelector('template[is="dom-bind"]');
+      scope.selected = 0;
+      scope.initCount = 0;
+
+      scope._computeCount = function(value) {
+        return Number(value);
+      }
+
+    </script>
+  </body>
+</html>
