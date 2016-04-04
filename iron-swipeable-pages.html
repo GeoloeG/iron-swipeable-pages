@@ -170,6 +170,24 @@ available swipeable elements will be updated accordingly.
           this._animatedPages = [];
         },
 
+        attached: function() {
+          document.addEventListener("selectionchange", this._onSelectionChange.bind(this));
+        },
+
+        detached: function() {
+          document.removeEventListener("selectionchange", this._onSelectionChange.bind(this));
+        },
+
+        _onSelectionChange: function(event) {
+          var selection = document.getSelection();
+          var range = selection ? selection.getRangeAt(0) : undefined;
+          if (range && range.startOffset != range.endOffset) {
+            this._swipeDisabled = true;
+          } else {
+            this._swipeDisabled = false;
+          }
+        },
+
         // Element page set up
 
         _onItemsChanged: function(event) {
@@ -185,14 +203,14 @@ available swipeable elements will be updated accordingly.
         _addPage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
-            // TODO PG: check for webkit 'webkitTransitionEnd'
+            this.listen(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.listen(page, 'transitionend', '_onTransitionEnd');
         },
 
         _removePage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
-            // TODO PG: check for webkit 'webkitTransitionEnd'
+            this.unlisten(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
         },
 
@@ -212,8 +230,7 @@ available swipeable elements will be updated accordingly.
         _onTrack: function(event) {
           var track = event.detail;
 
-          if (this.noCycle && !this._canCycle(track)) {
-            // TODO PG: eventually provide an animation to show the swiping blocking
+          if (this._swipeDisabled || (this.noCycle && !this._canCycle(track))) {
             return;
           }
 
