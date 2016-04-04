@@ -201,8 +201,6 @@ available swipeable elements will be updated accordingly.
           // warning if this occurs and the option is not enabled
           if (this.forceUpdate) {
             this.forceSynchronousItemUpdate();
-          } else {
-            console.warn("iron-swipeable-pages: consider using the property forceUpdate since `dom-change` event has been triggered inside the component");
           }
           // TODO: see if we can handle the case where a currently selected element disappear
           // and therefore force a swiping to the next available page...
