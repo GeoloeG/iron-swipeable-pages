@@ -85,7 +85,7 @@
         <button on-click="_onNextClick1">&gt;&gt;</button>
       </div>
 
-      <iron-swipeable-pages selected="{{selected1}}" threshold="0.1">
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected1}}" threshold="0.1">
         <div>Page 1</div>
         <div>Page 2</div>
         <div>Page 3</div>
@@ -99,7 +99,7 @@
         <button on-click="_onNextClick2">&gt;&gt;</button>
       </div>
 
-      <iron-swipeable-pages selected="{{selected2}}" threshold="0.1" no-cycle>
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected2}}" threshold="0.1" no-cycle>
         <div>Page 1</div>
         <div>Page 2</div>
         <div>Page 3</div>
@@ -114,7 +114,7 @@
         <paper-tab>Tab 4</paper-tab>
         <paper-tab>Tab 5</paper-tab>
       </paper-tabs>
-      <iron-swipeable-pages selected="{{selected3}}" threshold="0.1">
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected3}}" threshold="0.1">
         <div>Page 1</div>
         <div>Page 2</div>
         <div>Page 3</div>
@@ -129,6 +129,11 @@
       scope.selected1 = 0;
       scope.selected2 = 0;
       scope.selected3 = 0;
+
+      scope._onSelectedChanged = function(e) {
+        var target = e.target;
+        target.isGesture ? console.log("Swiped by Gesture!") : console.log("Swiped by Selection!");
+      };
 
       scope._onPrevClick1 = function() {
         scope.selected1 = scope.selected1 === 0 ? 4 : (scope.selected1 - 1);

@@ -53,9 +53,7 @@ available swipeable elements will be updated accordingly.
     }
     /* we cannot use `display=none` to take into account the case of conditional pages */
     :host > ::content > :not(.iron-selected):not(.iron-swiping) {
-      width: 0 !important;
-      height: 0 !important;
-      overflow: hidden;
+      display: none !important;
     }
   </style>
 
@@ -82,15 +80,6 @@ available swipeable elements will be updated accordingly.
             type: String,
             readOnly: true,
             value: null
-          },
-
-          // if some node are stamped conditionnally via `dom-if`, they should
-          // not be selectable to avoid swiping on blank pages.
-          // DO NOT CHANGE the default value
-          selectable: {
-            type: String,
-            readOnly: true,
-            value: ":not([style*='display']), :not([style*='none'])"
           },
 
           /**
@@ -145,19 +134,17 @@ available swipeable elements will be updated accordingly.
           },
 
           /**
-           * This option should be only relevant if you are using conditional pages, i.e.
-           * probably using `dom-if` or setting display: 'none' in certain conditions.
-           * A call to forceSynchronousItemUpdate is made if any `dom-change` are happening
+           * This option could be used for example to check in `on-selected-changed` that
+           * the selection was initiated by gesture and via data-binding or programmatically
            */
-          forceUpdate: {
+          isGesture: {
             type: Boolean,
             value: false
-          },
+          }
         },
 
         listeners: {
           'iron-items-changed': '_onItemsChanged',
-          'dom-change': '_onDomChange',
           'iron-deselect': '_onIronDeselectItem',
           'iron-select': '_onIronSelectItem',
           'track': '_onTrack'
@@ -194,18 +181,6 @@ available swipeable elements will be updated accordingly.
               return;
             this.unlisten(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
-        },
-
-        _onDomChange: function(event) {
-          // something might have change inside a template helper, e.g. `dom-if`
-          // so we should call forceSynchronousItemUpdate() to update the item list
-          // since it is not performance optimal, this is an opt-in option and we raise a
-          // warning if this occurs and the option is not enabled
-          if (this.forceUpdate) {
-            this.forceSynchronousItemUpdate();
-          }
-          // TODO: see if we can handle the case where a currently selected element disappear
-          // and therefore force a swiping to the next available page...
         },
 
         // Element tracking
@@ -262,6 +237,7 @@ available swipeable elements will be updated accordingly.
           // The element is swiped away if the swiping get passed the treshold.
           this._completeSwipe = Math.abs(trackData.dx) > this._getOffsetWidth() * this.threshold;
           if (this._completeSwipe) {
+            this.isGesture = true;
             var direction = trackData.dx > 0;
             // we are swipping, therefore update selected
             direction ? this.selectPrevious() : this.selectNext();
@@ -298,7 +274,6 @@ available swipeable elements will be updated accordingly.
               // reset pages state and we don't trigger any new animation because lastIndex is not valid anymore
               this._resetPages();
             } else {
-              this._swipeStarted = true;
               // reset the animated page list
               this._animatedPages = [];
               // in this case, selected has been modify w/o swiping, we need to apply the transformation
@@ -386,12 +361,13 @@ available swipeable elements will be updated accordingly.
             this.toggleClass('iron-swiping', false, this._animatedPages[i]);
           }
           this._transitionRunning = false;
+          this._swipeStarted = false;
+          this.isGesture = false;
         },
 
         _onTransitionEnd: function(event) {
           // reset pages state
           this._resetPages();
-          this._swipeStarted = false;
         },
 
         // Element utility functions
