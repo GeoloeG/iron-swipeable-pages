@@ -73,7 +73,7 @@
 
       <paper-input label="Number of pages" type="number" value="{{initCount}}"></paper-input>
 
-      <paper-tabs selected="{{selected}}">
+      <paper-tabs selected="{{selected}}" scrollable>
         <template is="dom-repeat-n" count="[[_computeCount(initCount)]]">
           <paper-tab>Tab [[index]]</paper-tab>
         </template>
