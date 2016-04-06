@@ -19,7 +19,8 @@
     "pages",
     "swipe",
     "swipeable",
-    "content"
+    "content",
+    "mobile"
   ],
   "main": "iron-swipeable-pages.html",
   "private": false,
