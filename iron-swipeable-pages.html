@@ -147,7 +147,8 @@ available swipeable elements will be updated accordingly.
           'iron-items-changed': '_onItemsChanged',
           'iron-deselect': '_onIronDeselectItem',
           'iron-select': '_onIronSelectItem',
-          'track': '_onTrack'
+          'dom-change': '_onDomChange',
+          'track': '_onTrack',
         },
 
         // Element Lifecycle
@@ -181,6 +182,12 @@ available swipeable elements will be updated accordingly.
               return;
             this.unlisten(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
+        },
+
+        _onDomChange: function(event) {
+          if ( this.selectedItem && this.selectedItem.offsetWidth == 0 ) {
+            this.selected = this.fallbackSelection;
+          }
         },
 
         // Element tracking
@@ -240,7 +247,7 @@ available swipeable elements will be updated accordingly.
             this.isGesture = true;
             var direction = trackData.dx > 0;
             // we are swipping, therefore update selected
-            direction ? this.selectPrevious() : this.selectNext();
+            direction ? this._selectPreviousPage() : this._selectNextPage();
             // trigger the animation in the proper direction
             this._animatePages(direction ? this._getOffsetWidth() : -this._getOffsetWidth());
           } else {
@@ -276,16 +283,30 @@ available swipeable elements will be updated accordingly.
             } else {
               // reset the animated page list
               this._animatedPages = [];
+              // skipped is used to filter the hidden element since they have a width == 0
+              // we use a negative value if we translate to the right
+              var skipped = 0;
               // in this case, selected has been modify w/o swiping, we need to apply the transformation
               if (index < this._lastIndex) {
                 // we translate to the right
-                for (var i = index; i <= this._lastIndex; i++) {
-                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._getOffsetWidth()*(i-this._lastIndex));
+                for (var i = this._lastIndex; i >= index; i--) {
+                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._getOffsetWidth()*(i-skipped-this._lastIndex));
+                  // Need for dom.flush()?
+                  if (this.items[i].offsetWidth == 0) {
+                    this._resetPage(this.items[i]);
+                    skipped--;
+                  }
                 }
               } else {
+                skipped = 0;
                 // we translate to the left
                 for (var j = this._lastIndex; j <= index; j++) {
-                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._getOffsetWidth()*(j-this._lastIndex));
+                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._getOffsetWidth()*(j-skipped-this._lastIndex));
+                  // Need for dom.flush()?
+                  if (this.items[j].offsetWidth == 0) {
+                    this._resetPage(this.items[j]);
+                    skipped++;
+                  }
                 }
               }
               this._transitionRunning = true;
@@ -293,7 +314,7 @@ available swipeable elements will be updated accordingly.
               // before animating, we need to be sure style are updated correctly
               var lastIndex = this._lastIndex;
               this.async( function() {
-                this._animatePages((lastIndex - index) * this._getOffsetWidth());
+                this._animatePages((lastIndex - index + skipped) * this._getOffsetWidth());
               });
             }
           }
@@ -315,13 +336,35 @@ available swipeable elements will be updated accordingly.
           // selected page
           this._initPage(this.selectedItem, 'none', 0);
           // left candidate
-          var leftIndex = (Number(this.indexOf(this.selectedItem)) - 1 + this.items.length) % this.items.length;
-          this._leftCandidate = this.items[leftIndex];
-          this._initPage(this._leftCandidate, 'none', -this._getOffsetWidth());
+          var skipped = 0;
+          var found = false;
+          while (!found) {
+            var leftIndex = (Number(this.indexOf(this.selectedItem)) - 1 - skipped + this.items.length) % this.items.length;
+            this._leftCandidate = this.items[leftIndex];
+            this._initPage(this._leftCandidate, 'none', -this._getOffsetWidth());
+            // Need for dom.flush()?
+            if (this._leftCandidate.offsetWidth > 0) {
+              found = true;
+            } else {
+              this._resetPage(this._leftCandidate);
+              skipped++;
+            }
+          }
           // right candidate
-          var rightIndex = (Number(this.indexOf(this.selectedItem)) + 1) % this.items.length;
-          this._rightCandidate = this.items[rightIndex];
-          this._initPage(this._rightCandidate, 'none', this._getOffsetWidth());
+          skipped = 0;
+          found = false;
+          while (!found) {
+            var rightIndex = (Number(this.indexOf(this.selectedItem)) + 1 + skipped) % this.items.length;
+            this._rightCandidate = this.items[rightIndex];
+            this._initPage(this._rightCandidate, 'none', this._getOffsetWidth());
+            // Need for dom.flush()?
+            if (this._rightCandidate.offsetWidth > 0) {
+              found = true;
+            } else {
+              this._resetPage(this._rightCandidate);
+              skipped++;
+            }
+          }
         },
 
         // prepare the page for animation and add it to the list of pages to be animated
@@ -352,13 +395,37 @@ available swipeable elements will be updated accordingly.
           }
         },
 
+        _selectPreviousPage: function() {
+          var index = this.indexOf(this._leftCandidate);
+          // TODO: should be replaced with this.selectIndex when merged in master: 
+          // https://github.com/PolymerElements/iron-selector/issues/87
+          this.selected = this._indexToValue(index);
+        },
+
+        _selectNextPage: function() {
+          var index = this.indexOf(this._rightCandidate);
+          // TODO: should be replaced with this.selectIndex when merged in master: 
+          // https://github.com/PolymerElements/iron-selector/issues/87
+          this.selected = this._indexToValue(index);
+        },
+
+        _resetPage: function(page) {
+          page.style.left = "0px";
+          page.style.webkitTransition = 'none';
+          page.style.transition = 'none';
+          this.toggleClass('iron-swiping', false, page);
+
+          this._animatedPages.pop();
+        },
+
         // remove the iron-swiping class and transition
         _resetPages: function() {
           for (var i = 0; i < this._animatedPages.length; i++) {
-            this._animatedPages[i].style.transition = 'none';
             this._animatedPages[i].style.left = '0px';
-            this.transform('none', this._animatedPages[i]);
+            this._animatedPages[i].style.webkitTransition = 'none';
+            this._animatedPages[i].style.transition = 'none';
             this.toggleClass('iron-swiping', false, this._animatedPages[i]);
+            this.transform('none', this._animatedPages[i]);
           }
           this._transitionRunning = false;
           this._swipeStarted = false;

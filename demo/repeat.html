@@ -10,6 +10,7 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
     <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
     <link rel="import" href="../../paper-tabs/paper-tab.html">
     <link rel="import" href="../../paper-tabs/paper-tabs.html">
     <link rel="import" href="../../paper-input/paper-input.html">
@@ -46,6 +47,11 @@
         @apply(--paper-font-display4);
       }
 
+      div.checkboxContainer {
+        background: var(--paper-grey-500)!important;
+        @apply(--paper-font-display1);
+      }
+
       div:nth-child(5n+1) {
         background: var(--paper-red-500);
       }
@@ -71,18 +77,31 @@
   <body>
     <template is="dom-bind">
 
-      <paper-input label="Number of pages" type="number" value="{{initCount}}"></paper-input>
+      <paper-input label="Number of pages" type="number" value="{{initCount}}" on-value-changed="_rebootArray"></paper-input>
 
       <paper-tabs selected="{{selected}}" scrollable>
-        <template is="dom-repeat-n" count="[[_computeCount(initCount)]]">
-          <paper-tab>Tab [[index]]</paper-tab>
+        <paper-tab>Begin Tab</paper-tab>
+        <template is="dom-repeat" items="[[pageArray]]" as="page">
+          <template is="dom-if" if="[[page.checked]]">
+            <paper-tab>Tab [[index]]</paper-tab>
+          </template>
         </template>
+        <paper-tab>End Tab</paper-tab>
       </paper-tabs>
       <iron-swipeable-pages selected="{{selected}}" threshold="0.1">
-        <template is="dom-repeat-n" count="[[_computeCount(initCount)]]">
-          <div>Page [[index]]</div>
+        <div>Begin Page</div>
+        <template is="dom-repeat" items="{{pageArray}}" as="page">
+          <template is="dom-if" if="[[page.checked]]">
+            <div>Page [[index]]</div>            
+          </template>
         </template>
+        <div>End Page</div>
       </iron-swipeable-pages>
+      <div class="checkboxContainer">
+        <template is="dom-repeat" items="{{pageArray}}" as="page">
+          <paper-checkbox checked="{{page.checked}}">Page [[index]]</paper-checkbox>
+        </template>
+      </div>
 
     </template>
     <script>
@@ -90,11 +109,18 @@
       var scope = document.querySelector('template[is="dom-bind"]');
       scope.selected = 0;
       scope.initCount = 0;
+      scope.pageArray = [];
 
       scope._computeCount = function(value) {
         return Number(value);
       }
 
+      scope._rebootArray = function(event) {
+        scope.pageArray = [];
+        for (var i=0; i < Number(event.detail.value); i++) {
+          scope.push('pageArray', {checked: true});
+        }
+      }
     </script>
   </body>
 </html>
