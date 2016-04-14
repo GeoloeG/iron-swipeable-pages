@@ -202,7 +202,7 @@ edgeSwipeSensitivity.
             return;
           }
 
-          if (track.x < this.edgeSwipeSensitivity || track.x > this.offsetWidth - this.edgeSwipeSensitivity) {
+          if ((track.x - track.dx) < this.edgeSwipeSensitivity || (track.x - track.dx) > this.offsetWidth - this.edgeSwipeSensitivity) {
             return;
           }
 
