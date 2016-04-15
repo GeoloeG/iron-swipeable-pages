@@ -57,6 +57,7 @@ available swipeable elements will be updated accordingly.
     #content > ::content > * {
       position: absolute;
       width: 100%;
+      height: 100%;
       will-change: left, transform;
     }
     #content > ::content > :not(.iron-selected):not(.iron-swiping) {
@@ -69,6 +70,7 @@ available swipeable elements will be updated accordingly.
       padding: 0;
       position: absolute;
       top: calc(50% - 4vw);
+      color: var(--primary-background-color);
     }
     .left {
       left: 0;
@@ -80,7 +82,7 @@ available swipeable elements will be updated accordingly.
 
   <template>
     <div id="content">
-      <content></content>      
+      <content></content>
     </div>
     <paper-icon-button
       class="left"
@@ -439,7 +441,7 @@ available swipeable elements will be updated accordingly.
 
         _selectPage: function(page) {
           var index = this.indexOf(page);
-          // TODO: should be replaced with this.selectIndex when merged in master: 
+          // TODO: should be replaced with this.selectIndex when merged in master:
           // https://github.com/PolymerElements/iron-selector/issues/87
           this.selected = this._indexToValue(index);
         },
