@@ -29,10 +29,17 @@ want to be swiped:
       cursor: default;
     }
 
+Note1: if you are using "conditional" pages, i.e. some content that are inside `dom-if` template,
+it might be useful to use the attribute `force-update` on the element, so that the list of
+available swipeable elements will be updated accordingly.
+Note2: if you are using a `<paper-drawer-panel>`, it might be wise to use one of the following property: 
+edgeSwipeSensitivity.
+
 @demo demo/index.html Standard Demo
 @demo demo/mobile.html Mobile Demo
 @demo demo/conditional.html Conditional Demo
 @demo demo/repeat.html Configurable Repeat Demo
+@demo demo/drawerpanel.html Drawer Panel Demo
 @hero hero.svg
 -->
 
@@ -135,7 +142,15 @@ want to be swiped:
           isGesture: {
             type: Boolean,
             value: false
-          }
+          },
+          /**
+           * How many pixels on the side of the screen are not sensitive to edge swipes.
+           */
+          edgeSwipeSensitivity: {
+            type: Number,
+            value: 0
+          },
+
 
         },
 
@@ -191,6 +206,10 @@ want to be swiped:
           var track = event.detail;
 
           if (this.noCycle && !this._canCycle(track)) {
+            return;
+          }
+
+          if ((track.x - track.dx) < this.edgeSwipeSensitivity || (track.x - track.dx) > this.offsetWidth - this.edgeSwipeSensitivity) {
             return;
           }
 
