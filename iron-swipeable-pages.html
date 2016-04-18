@@ -130,7 +130,7 @@ want to be swiped:
 
           /**
            * This option could be used for example to check in `on-selected-changed` that
-           * the selection was initiated by gesture and via data-binding or programmatically
+           * the selection was initiated by gesture or via data-binding or programmatically
            */
           isGesture: {
             type: Boolean,
@@ -263,7 +263,8 @@ want to be swiped:
 
         _onIronSelectItem: function(event) {
           // might happen at init of the component when first selected value is set and ready not called....
-          if (this._lastIndex === undefined) {
+          // or when a "selected" page disappear from the dom because of a "dom-if" with restamp option active
+          if (this._lastIndex === undefined || this._lastIndex === -1) {
             return;
           }
           var index = this.indexOf(event.detail.item);
