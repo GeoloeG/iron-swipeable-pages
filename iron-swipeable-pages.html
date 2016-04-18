@@ -2,9 +2,6 @@
 
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../iron-selector/iron-selectable.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
-
-<link rel="import" href="./iron-swipeable-pages-icons.html">
 
 <!--
 `<iron-swipeable-pages>` manages a set of pages and and provides the ability to switch
@@ -32,10 +29,6 @@ want to be swiped:
       cursor: default;
     }
 
-Note: if you are using "conditional" pages, i.e. some content that are inside `dom-if` template,
-it might be useful to use the attribute `force-update` on the element, so that the list of
-available swipeable elements will be updated accordingly.
-
 @demo demo/index.html Standard Demo
 @demo demo/mobile.html Mobile Demo
 @demo demo/conditional.html Conditional Demo
@@ -49,51 +42,18 @@ available swipeable elements will be updated accordingly.
       position: relative;
       display: block;
     }
-    #content {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
     #content > ::content > * {
       position: absolute;
       width: 100%;
-      height: 100%;
       will-change: left, transform;
     }
     #content > ::content > :not(.iron-selected):not(.iron-swiping) {
       display: none !important;
     }
-    paper-icon-button {
-      width: 8vw;
-      height: 8vw;
-      margin: 0;
-      padding: 0;
-      position: absolute;
-      top: calc(50% - 4vw);
-      color: var(--primary-background-color);
-    }
-    .left {
-      left: 0;
-    }
-    .right {
-      right: 0;
-    }
   </style>
 
   <template>
-    <div id="content">
-      <content></content>
-    </div>
-    <paper-icon-button
-      class="left"
-      icon="iron-swipeable-pages-icons:arrow-back"
-      on-tap="_selectPreviousPage">
-    </paper-icon-button>
-    <paper-icon-button
-      class="right"
-      icon="iron-swipeable-pages-icons:arrow-forward"
-      on-tap="_selectNextPage">
-    </paper-icon-button>
+    <content></content>
   </template>
 
   <script>
@@ -139,14 +99,6 @@ available swipeable elements will be updated accordingly.
            * Prevent cycling between first and last pages by swiping.
            */
           noCycle: {
-            type: Boolean,
-            value: false
-          },
-
-          /**
-           * Shows arrows to be used for navigation.
-           */
-          showArrow: {
             type: Boolean,
             value: false
           },

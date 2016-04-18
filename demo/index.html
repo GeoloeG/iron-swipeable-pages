@@ -36,6 +36,7 @@
 
       iron-swipeable-pages {
         @apply(--layout-flex);
+        
       }
 
       iron-swipeable-pages > * {
@@ -44,7 +45,10 @@
         -ms-user-select: none;      /* IE 10+ */
         user-select: none;          /* Likely future */
         cursor: default;
-        height: 100%;
+      }
+
+      .page {
+        height: 100%;        
       }
 
       div {
@@ -86,11 +90,11 @@
       </div>
 
       <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected1}}" threshold="0.1">
-        <div>Page 1</div>
-        <div>Page 2</div>
-        <div>Page 3</div>
-        <div>Page 4</div>
-        <div>Page 5</div>
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
       </iron-swipeable-pages>
 
       <div id="toolbar2">
@@ -100,11 +104,11 @@
       </div>
 
       <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected2}}" threshold="0.1" no-cycle>
-        <div>Page 1</div>
-        <div>Page 2</div>
-        <div>Page 3</div>
-        <div>Page 4</div>
-        <div>Page 5</div>
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
       </iron-swipeable-pages>
 
       <paper-tabs selected="{{selected3}}">
@@ -114,12 +118,12 @@
         <paper-tab>Tab 4</paper-tab>
         <paper-tab>Tab 5</paper-tab>
       </paper-tabs>
-      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected3}}" threshold="0.1">
-        <div>Page 1</div>
-        <div>Page 2</div>
-        <div>Page 3</div>
-        <div>Page 4</div>
-        <div>Page 5</div>
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected3}}" threshold="0.1" show-arrow>
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
       </iron-swipeable-pages>
 
     </template>
