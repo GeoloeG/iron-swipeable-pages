@@ -42,12 +42,12 @@ want to be swiped:
       position: relative;
       display: block;
     }
-    #content > ::content > * {
+    :host > ::content > * {
       position: absolute;
       width: 100%;
       will-change: left, transform;
     }
-    #content > ::content > :not(.iron-selected):not(.iron-swiping) {
+    :host > ::content > :not(.iron-selected):not(.iron-swiping) {
       display: none !important;
     }
   </style>
