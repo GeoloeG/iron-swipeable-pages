@@ -17,12 +17,12 @@
 
     <style is="custom-style">
       body {
-        margin: 0;
-        height: 100vh;
+        @apply(--layout-fullbleed);
+        @apply(--layout-vertical);
       }
 
       iron-swipeable-pages {
-        height: 100%;
+        @apply(--layout-flex);
       }
 
       iron-swipeable-pages > * {
