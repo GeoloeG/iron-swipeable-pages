@@ -217,9 +217,9 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             if (this.items.length < 2) {
               return;
             }
-            this._swipeStarted = true;
-
             this._trackStart(track);
+
+            this._swipeStarted = true;
           } else if (track.state === 'track' && this._swipeStarted) {
             this._trackMove(track);
           } else if (track.state === 'end' && this._swipeStarted) {
