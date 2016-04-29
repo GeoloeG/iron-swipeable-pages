@@ -277,10 +277,20 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         },
 
         _onIronDeselectItem: function(event) {
+          // Prevent bubbling of same event on child elements
+          if (event.detail.target !== this) {
+            return;
+          }
+
           this._lastIndex = this.indexOf(event.detail.item);
         },
 
         _onIronSelectItem: function(event) {
+          // Prevent bubbling of same event on child elements
+          if (event.detail.target !== this) {
+            return;
+          }
+
           // might happen at init of the component when first selected value is set and ready not called....
           // or when a "selected" page disappear from the dom because of a "dom-if" with restamp option active
           if (this._lastIndex === undefined || this._lastIndex === -1) {
