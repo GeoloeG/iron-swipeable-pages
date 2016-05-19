@@ -278,7 +278,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 
         _onIronDeselectItem: function(event) {
           // Prevent bubbling of same event on child elements
-          if (event.detail.target !== this) {
+          if (event.target !== this) {
             return;
           }
 
@@ -287,7 +287,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 
         _onIronSelectItem: function(event) {
           // Prevent bubbling of same event on child elements
-          if (event.detail.target !== this) {
+          if (event.target !== this) {
             return;
           }
 
