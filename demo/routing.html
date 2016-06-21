@@ -12,8 +12,8 @@
     <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
     <link rel="import" href="../../paper-styles/typography.html">
     <link rel="import" href="../../paper-styles/color.html">
-    <link rel="import" href="../../carbon-route/carbon-location.html">
-    <link rel="import" href="../../carbon-route/carbon-route.html">
+    <link rel="import" href="../../app-route/app-location.html">
+    <link rel="import" href="../../app-route/app-route.html">
 
     <link rel="import" href="../iron-swipeable-pages.html">
 
@@ -64,9 +64,9 @@
   </head>
   <body>
     <template is="dom-bind">
-      <carbon-location use-hash-as-path route="{{route}}"></carbon-location>
+      <app-location use-hash-as-path route="{{route}}"></app-location>
 
-      <carbon-route route="{{route}}" pattern="/:page" data="{{pageData}}"></carbon-route>
+      <app-route route="{{route}}" pattern="/:page" data="{{pageData}}"></app-route>
 
       <iron-swipeable-pages attr-for-selected="page" selected="{{pageData.page}}" threshold="0.1">
         <div page="page1">
