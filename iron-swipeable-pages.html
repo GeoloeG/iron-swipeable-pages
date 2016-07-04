@@ -37,6 +37,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 @demo demo/repeat.html Configurable Repeat Demo
 @demo demo/drawerpanel.html Drawer Panel Demo
 @demo demo/routing.html Routing Demo
+@demo demo/disabled.html Disabled Demo
 @hero hero.svg
 -->
 
@@ -143,6 +144,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             type: Boolean,
             value: false
           },
+
           /**
            * How many pixels on the side of the screen are not sensitive to edge swipes.
            */
@@ -151,6 +153,13 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             value: 0
           },
 
+          /**
+           * This option could be used to disable swiping.
+           */
+          disabled: {
+            type: Boolean,
+            value: false
+          },
 
         },
 
@@ -205,7 +214,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         _onTrack: function(event) {
           var track = event.detail;
 
-          if (this.noCycle && !this._canCycle(track)) {
+          if (this.disabled || (this.noCycle && !this._canCycle(track))) {
             return;
           }
 
