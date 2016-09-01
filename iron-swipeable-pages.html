@@ -56,7 +56,10 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
       will-change: left, transform;
     }
     :host > ::content > :not(.iron-selected):not(.iron-swiping) {
-      display: none !important;
+      left:-100% !important;
+    }
+    :host > ::content > .iron-selected{
+      left:0px;
     }
   </style>
 
