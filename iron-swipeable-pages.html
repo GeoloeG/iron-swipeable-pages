@@ -112,6 +112,18 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           },
 
           /**
+           * animate wrap-around between first and last as a direct transition
+           * like a carousel. this animation is only used when iron-select is
+           * fired from something OTHER a swipe. e.g. a call to selectNext()
+           * like you might make from a button or an a11y arrow-key binding.
+           * if false the wrap around flips backwards across all the pages.
+           */
+          carousel: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
            * The CSS transition duration applied swiping to next/previous page
            */
           transitionDuration: {
@@ -322,24 +334,62 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
               // we use a negative value if we translate to the right
               var skipped = 0;
               // in this case, selected has been modify w/o swiping, we need to apply the transformation
-              if (index < this._lastIndex) {
+
+              // This stuff supports carousel style wrap-around animation
+              var translateRight;
+              var virtualLastIndex = this._lastIndex;
+              var virtualIndex = index;
+              var len = this.items.length;
+
+              if (index == 0 && this._lastIndex == len - 1) {
+                // wrap-around
+                translateRight = true;
+                if (this.carousel) {
+                  translateRight = false;
+                  virtualIndex = len;
+                }
+              }
+              else if (index == len - 1 && this._lastIndex == 0) {
+                // wrap-around
+                translateRight = false;
+                if (this.carousel) {
+                  translateRight = true;
+                  virtualLastIndex = len;
+                }
+              }
+              else if (index > this._lastIndex) {
+                translateRight = false;
+              }
+              else {
+                translateRight = true;
+              }
+
+              if (translateRight) {
                 // we translate to the right
-                for (var i = this._lastIndex; i >= index; i--) {
-                  this._initPage(this.items[i], this._computeTransition(this._lastIndex-index), this._getOffsetWidth()*(i-skipped-this._lastIndex));
+                for (var i = virtualLastIndex; i >= virtualIndex; i--) {
+                  var item = this.items[i % len];
+                  this._initPage(
+                    item,
+                    this._computeTransition(virtualLastIndex - virtualIndex),
+                    this._getOffsetWidth()*(i - skipped - virtualLastIndex));
                   // Need for dom.flush()?
-                  if (this.items[i].offsetWidth == 0) {
-                    this._resetPage(this.items[i]);
+                  if (item.offsetWidth == 0) {
+                    this._resetPage(item);
                     skipped--;
                   }
                 }
               } else {
                 skipped = 0;
                 // we translate to the left
-                for (var j = this._lastIndex; j <= index; j++) {
-                  this._initPage(this.items[j], this._computeTransition(index-this._lastIndex), this._getOffsetWidth()*(j-skipped-this._lastIndex));
+                for (var j = virtualLastIndex; j <= virtualIndex; j++) {
+                  var item = this.items[j % len];
+                  this._initPage(
+                    item,
+                    this._computeTransition(virtualIndex - virtualLastIndex),
+                    this._getOffsetWidth()*(j - skipped - virtualLastIndex));
                   // Need for dom.flush()?
-                  if (this.items[j].offsetWidth == 0) {
-                    this._resetPage(this.items[j]);
+                  if (item.offsetWidth == 0) {
+                    this._resetPage(item);
                     skipped++;
                   }
                 }
@@ -347,9 +397,8 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
               this._transitionRunning = true;
 
               // before animating, we need to be sure style are updated correctly
-              var lastIndex = this._lastIndex;
               this.async( function() {
-                this._animatePages((lastIndex - index + skipped) * this._getOffsetWidth());
+                this._animatePages((virtualLastIndex - virtualIndex + skipped) * this._getOffsetWidth());
               });
             }
           }
