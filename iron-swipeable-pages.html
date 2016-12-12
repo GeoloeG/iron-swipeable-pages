@@ -193,6 +193,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         _addPage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
+            page.setAttribute('aria-hidden', !page.classList.contains('iron-selected'));
             this.listen(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.listen(page, 'transitionend', '_onTransitionEnd');
         },
@@ -452,6 +453,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             this._animatedPages[i].style.left = '0px';
             this._animatedPages[i].style.webkitTransition = 'none';
             this._animatedPages[i].style.transition = 'none';
+            this._animatedPages[i].setAttribute('aria-hidden', !this._animatedPages[i].classList.contains('iron-selected'));
             this.toggleClass('iron-swiping', false, this._animatedPages[i]);
             this.transform('none', this._animatedPages[i]);
           }
