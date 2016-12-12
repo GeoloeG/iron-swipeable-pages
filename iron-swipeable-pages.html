@@ -169,6 +169,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           'iron-select': '_onIronSelectItem',
           'dom-change': '_onDomChange',
           'track': '_onTrack',
+          'iron-resize': '_onResize'
         },
 
         // Element Lifecycle
@@ -481,7 +482,12 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         },
 
         _getOffsetWidth: function () {
-          return this.offsetWidth + (2 * this.padding);
+          this._offsetWidth = this._offsetWidth || this.offsetWidth + (2 * this.padding);
+          return this._offsetWidth;
+        },
+
+        _onResize: function() {
+          this._offsetWidth = this.offsetWidth + (2 * this.padding);
         },
 
         _computeTransition: function(factor) {
