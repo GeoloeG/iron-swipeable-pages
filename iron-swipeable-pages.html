@@ -56,7 +56,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
       will-change: left, transform;
     }
     :host > ::content > :not(.iron-selected):not(.iron-swiping) {
-      display: none !important;
+      left: -100% !important;
     }
   </style>
 
@@ -169,6 +169,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           'iron-select': '_onIronSelectItem',
           'dom-change': '_onDomChange',
           'track': '_onTrack',
+          'iron-resize': '_onResize'
         },
 
         // Element Lifecycle
@@ -193,6 +194,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         _addPage: function(page) {
             if (!page || page.nodeType !== Node.ELEMENT_NODE)
               return;
+            page.setAttribute('aria-hidden', !page.classList.contains('iron-selected'));
             this.listen(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.listen(page, 'transitionend', '_onTransitionEnd');
         },
@@ -353,15 +355,6 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
               });
             }
           }
-
-          // notifyResize
-          this.async(function() {
-            var selectedPage = this.selectedItem;
-            this.resizerShouldNotify = function(element) {
-              return element == selectedPage || selectedPage.contains(element);
-            };
-            this.notifyResize();
-          });
         },
 
         // Element page management
@@ -452,6 +445,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             this._animatedPages[i].style.left = '0px';
             this._animatedPages[i].style.webkitTransition = 'none';
             this._animatedPages[i].style.transition = 'none';
+            this._animatedPages[i].setAttribute('aria-hidden', !this._animatedPages[i].classList.contains('iron-selected'));
             this.toggleClass('iron-swiping', false, this._animatedPages[i]);
             this.transform('none', this._animatedPages[i]);
           }
@@ -479,7 +473,12 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         },
 
         _getOffsetWidth: function () {
-          return this.offsetWidth + (2 * this.padding);
+          this._offsetWidth || this.offsetWidth + (2 * this.padding);
+          return this._offsetWidth;
+        },
+
+        _onResize: function() {
+          this._offsetWidth = this.offsetWidth + (2 * this.padding);
         },
 
         _computeTransition: function(factor) {
