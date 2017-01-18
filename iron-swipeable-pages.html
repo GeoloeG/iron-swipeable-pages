@@ -42,25 +42,25 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 -->
 
 <dom-module id="iron-swipeable-pages">
-  <style>
-    :host {
-      position: relative;
-      display: block;
-      overflow-x: hidden;
-    }
-    :host > ::content > * {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      will-change: left, transform;
-    }
-    :host > ::content > :not(.iron-selected):not(.iron-swiping) {
-      left: -100% !important;
-    }
-  </style>
-
   <template>
+    <style>
+      :host {
+        position: relative;
+        display: block;
+        overflow-x: hidden;
+      }
+      :host > ::content > * {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        will-change: left, transform;
+      }
+      :host > ::content > :not(.iron-selected):not(.iron-swiping) {
+        left: -100% !important;
+      }
+    </style>
+    
     <content></content>
   </template>
 
