@@ -49,19 +49,19 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         display: block;
         overflow-x: hidden;
       }
-      :host > ::content > * {
+      :host > ::slotted(*) {
         position: absolute;
         width: 100%;
         height: 100%;
         overflow-y: auto;
         will-change: left, transform;
       }
-      :host > ::content > :not(.iron-selected):not(.iron-swiping) {
+      :host > ::slotted(:not(.iron-selected):not(.iron-swiping)) {
         left: -100% !important;
       }
     </style>
     
-    <content></content>
+    <slot></slot>
   </template>
 
   <script>
