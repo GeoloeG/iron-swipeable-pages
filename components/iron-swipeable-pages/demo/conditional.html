@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+  <head>
+    <title>iron-swipeable-pages demo: conditional with `dom-if`s</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../paper-styles/color.html">
+    <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+
+    <link rel="import" href="../iron-swipeable-pages.html">
+
+    <style is="custom-style">
+      body {
+        overflow: hidden;
+        @apply(--layout-fullbleed);
+        @apply(--layout-vertical);
+      }
+
+      span {
+        background: var(--paper-grey-500);
+        @apply(--paper-font-title);
+        padding: 8px;
+      }
+  
+      .checkboxContainer {
+        @apply(--layout-horizontal);
+        @apply(--layout-around-justified);
+      }
+
+      paper-checkbox:nth-child(1) {
+        --paper-checkbox-label-color: var(--paper-red-500);
+      }
+
+      paper-checkbox:nth-child(2) {
+        --paper-checkbox-label-color: var(--paper-blue-500);
+      }
+
+      paper-checkbox:nth-child(3) {
+        --paper-checkbox-label-color: var(--paper-orange-500);
+      }
+
+      paper-checkbox:nth-child(4) {
+        --paper-checkbox-label-color: var(--paper-green-500);
+      }
+
+      paper-checkbox:nth-child(5) {
+        --paper-checkbox-label-color: var(--paper-purple-500);
+      }
+
+      iron-swipeable-pages {
+        @apply(--layout-flex);
+      }
+
+      iron-swipeable-pages > * {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
+        cursor: default;
+        height: 100%;
+      }
+
+      div {
+        color: white;
+        font-size: 2rem;
+      }
+
+      iron-swipeable-pages > div {
+        background: var(--paper-grey-500);
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+      }
+
+      .red {
+        background: var(--paper-red-500);
+      }
+      .blue {
+        background: var(--paper-blue-500);
+      }
+      .orange {
+        background: var(--paper-orange-500);
+      }
+      .green {
+        background: var(--paper-green-500);
+      }
+      .purple {
+        background: var(--paper-purple-500);
+      }
+
+    </style>
+  </head>
+  <body>
+    <template is="dom-bind">
+      <span>You can select which page will be displayed (dom-if do NOT restamp)</span>
+      <div class="checkboxContainer">
+        <paper-checkbox checked="{{!page11}}"> page 1</paper-checkbox>
+        <paper-checkbox checked="{{!page12}}"> page 2</paper-checkbox>
+        <paper-checkbox checked="{{!page13}}"> page 3</paper-checkbox>
+        <paper-checkbox checked="{{!page14}}"> page 4</paper-checkbox>
+        <paper-checkbox checked="{{!page15}}"> page 5</paper-checkbox>
+      </div>
+      <iron-swipeable-pages 
+        selected="0" 
+        fallback-selection="0"
+        threshold="0.1" force-update>
+        <div class="grey">Page 0</div>
+        <template is="dom-if" if="[[page11]]">
+          <div class="red">Page 1</div>
+        </template>
+        <template is="dom-if" if="[[page12]]">
+          <div class="blue">Page 2</div>
+        </template>
+        <template is="dom-if" if="[[page13]]">
+          <div class="orange">Page 3</div>
+        </template>
+        <template is="dom-if" if="[[page14]]">
+          <div class="green">Page 4</div>
+        </template>
+        <template is="dom-if" if="[[page15]]">
+          <div class="purple">Page 5</div>
+        </template>
+      </iron-swipeable-pages>
+      <span>You can select which page will be displayed (dom-if DO restamp)</span>
+      <div class="checkboxContainer">
+        <paper-checkbox checked="{{!page21}}"> page 1</paper-checkbox>
+        <paper-checkbox checked="{{!page22}}"> page 2</paper-checkbox>
+        <paper-checkbox checked="{{!page23}}"> page 3</paper-checkbox>
+        <paper-checkbox checked="{{!page24}}"> page 4</paper-checkbox>
+        <paper-checkbox checked="{{!page25}}"> page 5</paper-checkbox>
+      </div>
+      <iron-swipeable-pages 
+        selected="0" 
+        fallback-selection="0"
+        threshold="0.1" force-update>
+        <div class="grey">Page 0</div>
+        <template is="dom-if" if="[[page21]]" restamp>
+          <div class="red">Page 1</div>
+        </template>
+        <template is="dom-if" if="[[page22]]" restamp>
+          <div class="blue">Page 2</div>
+        </template>
+        <template is="dom-if" if="[[page23]]" restamp>
+          <div class="orange">Page 3</div>
+        </template>
+        <template is="dom-if" if="[[page24]]" restamp>
+          <div class="green">Page 4</div>
+        </template>
+        <template is="dom-if" if="[[page25]]" restamp>
+          <div class="purple">Page 5</div>
+        </template>
+      </iron-swipeable-pages>
+      <span>You can select (with attr-for-selected and fallback-selection) which page will be displayed (dom-if do NOT restamp)</span>
+      <div class="checkboxContainer">
+        <paper-checkbox checked="{{!page31}}"> page 1</paper-checkbox>
+        <paper-checkbox checked="{{!page32}}"> page 2</paper-checkbox>
+        <paper-checkbox checked="{{!page33}}"> page 3</paper-checkbox>
+        <paper-checkbox checked="{{!page34}}"> page 4</paper-checkbox>
+        <paper-checkbox checked="{{!page35}}"> page 5</paper-checkbox>
+      </div>
+      <iron-swipeable-pages 
+        attr-for-selected="page" 
+        fallback-selection="page30"
+        selected="page30" 
+        threshold="0.1">
+        <div class="grey" page="page30">Page 0</div>
+        <template is="dom-if" if="[[page31]]">
+          <div class="red" page="page31">Page 1</div>
+        </template>
+        <template is="dom-if" if="[[page32]]">
+          <div class="blue" page="page32">Page 2</div>
+        </template>
+        <template is="dom-if" if="[[page33]]">
+          <div class="orange" page="page33">Page 3</div>
+        </template>
+        <template is="dom-if" if="[[page34]]">
+          <div class="green" page="page34">Page 4</div>
+        </template>
+        <template is="dom-if" if="[[page35]]">
+          <div class="purple" page="page35">Page 5</div>
+        </template>
+      </iron-swipeable-pages>
+      <span>You can select (with attr-for-selected and fallback-selection) which page will be displayed (dom-if DO restamp)</span>
+      <div class="checkboxContainer">
+        <paper-checkbox checked="{{!page41}}"> page 1</paper-checkbox>
+        <paper-checkbox checked="{{!page42}}"> page 2</paper-checkbox>
+        <paper-checkbox checked="{{!page43}}"> page 3</paper-checkbox>
+        <paper-checkbox checked="{{!page44}}"> page 4</paper-checkbox>
+        <paper-checkbox checked="{{!page45}}"> page 5</paper-checkbox>
+      </div>
+      <iron-swipeable-pages 
+        attr-for-selected="page" 
+        fallback-selection="page40"
+        selected="page40" 
+        threshold="0.1">
+        <div class="grey" page="page40">Page 0</div>
+        <template is="dom-if" if="[[page41]]" restamp>
+          <div class="red" page="page41">Page 1</div>
+        </template>
+        <template is="dom-if" if="[[page42]]" restamp>
+          <div class="blue" page="page42">Page 2</div>
+        </template>
+        <template is="dom-if" if="[[page43]]" restamp>
+          <div class="orange" page="page43">Page 3</div>
+        </template>
+        <template is="dom-if" if="[[page44]]" restamp>
+          <div class="green" page="page44">Page 4</div>
+        </template>
+        <template is="dom-if" if="[[page45]]" restamp>
+          <div class="purple" page="page45">Page 5</div>
+        </template>
+      </iron-swipeable-pages>
+    </template>
+  </body>
+</html>

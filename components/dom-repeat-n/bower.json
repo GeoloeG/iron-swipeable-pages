@@ -1,0 +1,48 @@
+{
+  "name": "dom-repeat-n",
+  "version": "1.0.3",
+  "authors": [
+    "Pascal Gula aka MeTaNoV <pascal.gula@gmail.com>"
+  ],
+  "description": "A template that repeat its content 'n' times.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "web",
+    "component",
+    "components",
+    "custom",
+    "element",
+    "polymer",
+    "template",
+    "repeat",
+    "n",
+    "times"
+  ],
+  "main": "dom-repeat-n.html",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/MeTaNoV/dom-repeat-n.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/MeTaNoV/dom-repeat-n/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0"
+  },
+  "devDependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0",
+    "paper-input": "PolymerElements/paper-input#^1.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "web-component-tester": "^4.0.0"
+  }
+}

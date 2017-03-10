@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+  <head>
+    <title>iron-swipeable-pages demo: declarative</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../paper-tabs/paper-tab.html">
+    <link rel="import" href="../../paper-tabs/paper-tabs.html">
+    <link rel="import" href="../../paper-styles/typography.html">
+    <link rel="import" href="../../paper-styles/color.html">
+
+    <link rel="import" href="../iron-swipeable-pages.html">
+
+    <style is="custom-style">
+      body {
+        @apply --layout-fullbleed;
+        @apply --layout-vertical;
+      }
+
+      #toolbar1, #toolbar2 {
+        background: var(--paper-grey-500);
+        @apply --paper-font-headline;
+        padding: 8px;
+      }
+
+      button {
+        margin: 8px;
+      }
+
+      iron-swipeable-pages {
+        @apply --layout-flex;
+      }
+
+      iron-swipeable-pages > * {
+        -webkit-user-select: none;  /* Chrome all / Safari all */
+        -moz-user-select: none;     /* Firefox all */
+        -ms-user-select: none;      /* IE 10+ */
+        user-select: none;          /* Likely future */
+        cursor: default;
+      }
+
+      .page {
+        height: 100%;        
+      }
+
+      div {
+        color: white;
+        @apply --layout-horizontal;
+        @apply --layout-center-center;
+        @apply --paper-font-display4;
+      }
+
+      div:nth-child(1) {
+        background: var(--paper-red-500);
+      }
+
+      div:nth-child(2) {
+        background: var(--paper-blue-500);
+      }
+
+      div:nth-child(3) {
+        background: var(--paper-orange-500);
+      }
+
+      div:nth-child(4) {
+        background: var(--paper-green-500);
+      }
+
+      div:nth-child(5) {
+        background: var(--paper-purple-500);
+      }
+
+    </style>
+  </head>
+  <body>
+    <template is="dom-bind">
+
+      <div id="toolbar1">
+        <button on-click="_onPrevClick1">&lt;&lt;</button>
+        Cycling by swipe enabled
+        <button on-click="_onNextClick1">&gt;&gt;</button>
+      </div>
+
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected1}}" threshold="0.2">
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
+      </iron-swipeable-pages>
+
+      <div id="toolbar2">
+        <button on-click="_onPrevClick2">&lt;&lt;</button>
+        Cycling by swipe disabled (still working by selection)
+        <button on-click="_onNextClick2">&gt;&gt;</button>
+      </div>
+
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected2}}" threshold="0.2" no-cycle>
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
+      </iron-swipeable-pages>
+
+      <paper-tabs selected="{{selected3}}">
+        <paper-tab>Tab 1</paper-tab>
+        <paper-tab>Tab 2</paper-tab>
+        <paper-tab>Tab 3</paper-tab>
+        <paper-tab>Tab 4</paper-tab>
+        <paper-tab>Tab 5</paper-tab>
+      </paper-tabs>
+      <iron-swipeable-pages on-selected-changed="_onSelectedChanged" selected="{{selected3}}" threshold="0.2" show-arrow>
+        <div class="page">Page 1</div>
+        <div class="page">Page 2</div>
+        <div class="page">Page 3</div>
+        <div class="page">Page 4</div>
+        <div class="page">Page 5</div>
+      </iron-swipeable-pages>
+
+    </template>
+    <script>
+
+      var scope = document.querySelector('template[is="dom-bind"]');
+      scope.selected1 = 0;
+      scope.selected2 = 0;
+      scope.selected3 = 0;
+
+      scope._onSelectedChanged = function(e) {
+        var target = e.target;
+        target.isGesture ? console.log("Swiped by Gesture!") : console.log("Swiped by Selection!");
+      };
+
+      scope._onPrevClick1 = function() {
+        scope.selected1 = scope.selected1 === 0 ? 4 : (scope.selected1 - 1);
+      };
+
+      scope._onNextClick1 = function() {
+        scope.selected1 = scope.selected1 === 4 ? 0 : (scope.selected1 + 1);
+      };
+
+      scope._onPrevClick2 = function() {
+        scope.selected2 = scope.selected2 === 0 ? 4 : (scope.selected2 - 1);
+      };
+
+      scope._onNextClick2 = function() {
+        scope.selected2 = scope.selected2 === 4 ? 0 : (scope.selected2 + 1);
+      };
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,238 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+A template element that repeat `n` times its content.
+
+Example:
+
+    <template is="dom-repeat-n" count="3">
+      <div>I am div {{index}}</div>
+    </template>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+<script>
+  Polymer({
+    is: 'dom-repeat-n',
+    extends: 'template',
+    // The following specifies that the element stamp directly no content,
+    // i.e. does not have a <template> section declared
+    _template: null,
+
+    /**
+     * Fired whenever DOM is added or removed by this template (by
+     * default, rendering occurs lazily).
+     *
+     * @event dom-change
+     */
+
+    properties: {
+      /**
+       * `count` specifies the number of times to repeat the template content.
+       */
+      count: {
+        type: Number,
+        value: 0,
+        observer: '_countChanged'
+      },
+
+      /**
+       * `start` specifies the value of the first index and default to 0.
+       */
+      start: {
+        type: Number,
+        value: 0,
+        observer: '_startChanged'
+      },
+
+      /**
+       * `increment` specifies the increment value between indices.
+       */
+      increment: {
+        type: Number,
+        value: 1,
+        observer: '_incrementChanged'
+      },
+
+      /**
+       * The name of the variable to add to the binding scope with the index
+       * for the templates instances.
+       */
+      indexAs: {
+        type: String,
+        value: 'index'
+      },
+
+    },
+
+    behaviors: [
+      Polymer.Templatizer
+    ],
+
+    // Element Lifecycle
+
+    created: function() {
+      this._instances = [];
+      this._pool = [];
+    },
+
+    ready: function() {
+      // Template instance props that should be excluded from forwarding
+      this._instanceProps = {};
+      this._instanceProps[this.indexAs] = true;
+      // Templatizing (generating the instance constructor) needs to wait
+      // until ready, since won't have its template content handed back to
+      // it until then
+      if (!this.ctor) {
+        this.templatize(this);
+      }
+    },
+
+    attached: function() {
+      var parent = Polymer.dom(Polymer.dom(this).parentNode);
+      for (var i=0; i<this._instances.length; i++) {
+        this._attachInstance(i, parent);
+      }
+    },
+
+    detached: function() {
+      for (var i=0; i<this._instances.length; i++) {
+        this._detachInstance(i);
+      }
+    },
+
+    // Element Behavior
+
+    _countChanged: function(newCount, oldCount) {
+      if(parseInt(newCount)) {
+        newCount = parseInt(newCount);
+      }
+      if (typeof(newCount) !== "number") {
+        this.count = oldCount;
+        console.error("dom-repeat-n: count should be a number");
+        return;
+      }
+      if (newCount < 0) {
+        this.count = oldCount;
+        console.error("dom-repeat-n: count cannot be negative");
+        return;
+      }
+      // we use async to enable ready to be called before this code
+      this.async(function() {
+        var i;
+        // Generate possible missing instances if count increased
+        for (i=0; i<newCount; i++) {
+          var inst = this._instances[i];
+          if (!inst) {
+            inst = this._insertInstance(i);
+          }
+        }
+        // Remove any extra instances from previous state
+        var limit = this._instances.length;
+        for (i=limit-1; i>newCount-1; i--) {
+            this._detachAndRemoveInstance(i);
+        }
+        this._debounceTemplate(this._render);
+        this.fire('dom-change');
+      });
+    },
+
+    _startChanged: function(newStart, oldStart) {
+      if (typeof(newStart) !== "number") {
+        this.start = oldStart;
+        console.error("dom-repeat-n: start should be a number");
+        return;
+      }
+      this._debounceTemplate(this._render);
+    },
+
+    _incrementChanged: function(newIncrement, oldIncrement) {
+      if (typeof(newIncrement) !== "number") {
+        this.increment = oldIncrement;
+        console.error("dom-repeat-n: start should be a number");
+        return;
+      }
+      this._debounceTemplate(this._render);
+    },
+
+    _render: function() {
+      for (var i=0, k=this._instances.length; i<k; i++) {
+        var inst = this._instances[i];
+        inst.__setProperty(this.indexAs, i*this.increment+this.start, true);
+      }
+    },
+
+    _attachInstance: function(idx, parent) {
+      var inst = this._instances[idx];
+      parent.insertBefore(inst.root, this);
+    },
+
+    _detachInstance: function(idx) {
+      var inst = this._instances[idx];
+      for (var i=0; i<inst._children.length; i++) {
+        var el = inst._children[i];
+        Polymer.dom(inst.root).appendChild(el);
+      }
+      return inst;
+    },
+
+    _detachAndRemoveInstance: function(idx) {
+      var inst = this._detachInstance(idx);
+      if (inst) {
+        this._pool.push(inst);
+      }
+      this._instances.splice(idx, 1);
+    },
+
+    _stampInstance: function(idx) {
+      var model = {};
+      model[this.indexAs] = idx;
+      return this.stamp(model);
+    },
+
+    _insertInstance: function(idx) {
+      var inst = this._pool.pop();
+      if (!inst) {
+        inst = this._stampInstance(idx);
+      }
+      var beforeRow = this._instances[idx + 1];
+      var beforeNode = (beforeRow && !beforeRow.isPlaceholder) ? beforeRow._children[0] : this;
+      var parentNode = Polymer.dom(this).parentNode;
+      Polymer.dom(parentNode).insertBefore(inst.root, beforeNode);
+      this._instances.push(inst);
+      return inst;
+    },
+
+    // Implements extension point from Templatizer mixin
+    _showHideChildren: function(hidden) {
+      for (var i=0; i<this._instances.length; i++) {
+        this._instances[i]._showHideChildren(hidden);
+      }
+    },
+
+    // Implements extension point from Templatizer mixin
+    // Called as side-effect of a host property change, responsible for
+    // notifying parent path change on each inst
+    _forwardParentProp: function(prop, value) {
+      var i$ = this._instances;
+      for (var i=0, inst; (i<i$.length) && (inst=i$[i]); i++) {
+        if (!inst.isPlaceholder) {
+          inst.__setProperty(prop, value, true);
+        }
+      }
+    },
+
+    // Implements extension point from Templatizer
+    // Called as side-effect of a host path change, responsible for
+    // notifying parent path change on each inst
+    _forwardParentPath: function(path, value) {
+      var i$ = this._instances;
+      for (var i=0, inst; (i<i$.length) && (inst=i$[i]); i++) {
+        if (!inst.isPlaceholder) {
+          inst._notifyPath(path, value, true);
+        }
+      }
+    }
+  });
+</script>
