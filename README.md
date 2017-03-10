@@ -28,7 +28,7 @@ And then use it:
 ```
 <custom-element-demo>
   <template>
-    <link rel="import" href="numbro-element.html">
+    <link rel="import" href="iron-swipeable-pages.html">
 	  <next-code-block></next-code-block>
   </template>
 </custom-element-demo>
