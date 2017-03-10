@@ -1,14 +1,14 @@
 ## Registering to Bower
 
-`bower register iron-swipeable-pages git://github.com/MeTaNoV/iron-swipeable-pages.git`
+`bower register iron-swipeable-pages git://github.com/GeoloeG/iron-swipeable-pages.git`
 
 ## Registering to Gemnasium
 
-https://gemnasium.com/MeTaNoV/
+https://gemnasium.com/GeoloeG/
 
 ## Registering to Waffle
 
-https://waffle.io/MeTaNoV/firebase-element-extended
+https://waffle.io/GeoloeG/iron-swipeable-pages
 
 ## Registering to Travis
 

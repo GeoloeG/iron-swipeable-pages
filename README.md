@@ -1,12 +1,10 @@
-[![Bower version](https://badge.fury.io/bo/iron-swipeable-pages.svg)](https://badge.fury.io/bo/iron-swipeable-pages)
-[![Build Status](https://travis-ci.org/MeTaNoV/iron-swipeable-pages.svg?branch=master)](https://travis-ci.org/MeTaNoV/iron-swipeable-pages)
-[![Dependency Status](https://gemnasium.com/MeTaNoV/iron-swipeable-pages.svg)](https://gemnasium.com/MeTaNoV/iron-swipeable-pages)
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg?style=flat-square)](https://www.webcomponents.org/element/GeoloeG/iron-swipeable-pages)
+
+# `<iron-swipeable-pages>`
+
+## Descripton
 
 `<iron-swipeable-pages>` manages a set of pages and provides the ability to switch between them by swiping gesture.
-
-## Demo
-
-[https://metanov.github.io/iron-swipeable-pages/](https://metanov.github.io/iron-swipeable-pages/components/iron-swipeable-pages/demo/)
 
 ## Install
 
@@ -26,6 +24,16 @@ Import Custom Element:
 
 And then use it:
 
+<!---
+```
+<custom-element-demo>
+  <template>
+    <link rel="import" href="numbro-element.html">
+	  <next-code-block></next-code-block>
+  </template>
+</custom-element-demo>
+```
+-->
 ```html
 <iron-swipeable-pages selected="0">
   <div>One</div>
@@ -34,7 +42,11 @@ And then use it:
 </iron-swipeable-pages>
 ```
 
-See the [Documentation](https://metanov.github.io/iron-swipeable-pages/) for more options.
+See the [Documentation](https://geoloeg.github.io/iron-swipeable-pages/) for more options.
+
+## More Demos
+
+[https://geoloeg.github.io/iron-swipeable-pages/](https://geoloeg.github.io/iron-swipeable-pages/components/iron-swipeable-pages/demo/)
 
 ## Discussing
 
@@ -47,10 +59,3 @@ If you have any questions, you can find me on the [Polymer Slack Channel](https:
 3. Commit your changes: `git commit -m 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
-
-## License
-
-[MIT License](http://opensource.org/licenses/MIT) © Pascal Gula
-
-[![Throughput Graph](https://graphs.waffle.io/MeTaNoV/iron-swipeable-pages/throughput.svg)](https://waffle.io/MeTaNoV/iron-swipeable-pages/metrics)
-
