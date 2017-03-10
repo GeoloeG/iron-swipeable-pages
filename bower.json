@@ -26,10 +26,10 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "git://github.com/MeTaNoV/iron-swipeable-pages.git"
+    "url": "git://github.com/GeoloeG/iron-swipeable-pages.git"
   },
   "license": "MIT",
-  "homepage": "https://github.com/MeTaNoV/iron-swipeable-pages/",
+  "homepage": "https://github.com/GeoloeG/iron-swipeable-pages/",
   "ignore": [
     "/.*",
     "/test/",
@@ -43,7 +43,7 @@
   "devDependencies": {
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "web-component-tester": "^4.0.0",
-    "iron-component-page": "MeTaNoV/iron-component-page#multiple-demo",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "iron-test-helpers": "PolymerElements/iron-test-helpers#^1.0.0",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.1.0",
