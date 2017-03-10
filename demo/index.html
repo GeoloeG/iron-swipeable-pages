@@ -19,13 +19,13 @@
 
     <style is="custom-style">
       body {
-        @apply(--layout-fullbleed);
-        @apply(--layout-vertical);
+        @apply --layout-fullbleed;
+        @apply --layout-vertical;
       }
 
       #toolbar1, #toolbar2 {
         background: var(--paper-grey-500);
-        @apply(--paper-font-headline);
+        @apply --paper-font-headline;
         padding: 8px;
       }
 
@@ -34,7 +34,7 @@
       }
 
       iron-swipeable-pages {
-        @apply(--layout-flex);
+        @apply --layout-flex;
       }
 
       iron-swipeable-pages > * {
@@ -51,9 +51,9 @@
 
       div {
         color: white;
-        @apply(--layout-horizontal);
-        @apply(--layout-center-center);
-        @apply(--paper-font-display4);
+        @apply --layout-horizontal;
+        @apply --layout-center-center;
+        @apply --paper-font-display4;
       }
 
       div:nth-child(1) {
