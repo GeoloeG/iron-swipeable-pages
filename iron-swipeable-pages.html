@@ -927,7 +927,10 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           if (index === 0 && trackData.dx > 0) {
             return false;
           }
-          return (index === this.items.length - 1 && trackData.dx < 0);
+          if (index === this.items.length - 1 && trackData.dx < 0) {
+            return false;
+          }
+          return true;
         }
 
         _getOffsetWidth() {
