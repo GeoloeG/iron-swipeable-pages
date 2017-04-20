@@ -17,66 +17,69 @@
 
     <link rel="import" href="../iron-swipeable-pages.html">
 
-    <style is="custom-style">
-      body {
-        @apply --layout-fullbleed;
-        @apply --layout-vertical;
-      }
+    <custom-style>
+      <!--TODO PG: finish the custom-style refactor-->
+      <!--https://github.com/PolymerElements/iron-input/pull/91-->
+      <style is="custom-style">
+        body {
+          @apply --layout-fullbleed;
+          @apply --layout-vertical;
+        }
 
-      #toolbar1, #toolbar2 {
-        background: var(--paper-grey-500);
-        @apply --paper-font-headline;
-        padding: 8px;
-      }
+        #toolbar1, #toolbar2 {
+          background: var(--paper-grey-500);
+          @apply --paper-font-headline;
+          padding: 8px;
+        }
 
-      button {
-        margin: 8px;
-      }
+        button {
+          margin: 8px;
+        }
 
-      iron-swipeable-pages {
-        @apply --layout-flex;
-      }
+        iron-swipeable-pages {
+          @apply --layout-flex;
+        }
 
-      iron-swipeable-pages > * {
-        -webkit-user-select: none;  /* Chrome all / Safari all */
-        -moz-user-select: none;     /* Firefox all */
-        -ms-user-select: none;      /* IE 10+ */
-        user-select: none;          /* Likely future */
-        cursor: default;
-      }
+        iron-swipeable-pages > * {
+          -webkit-user-select: none;  /* Chrome all / Safari all */
+          -moz-user-select: none;     /* Firefox all */
+          -ms-user-select: none;      /* IE 10+ */
+          user-select: none;          /* Likely future */
+          cursor: default;
+        }
 
-      .page {
-        height: 100%;        
-      }
+        .page {
+          height: 100%;        
+        }
 
-      div {
-        color: white;
-        @apply --layout-horizontal;
-        @apply --layout-center-center;
-        @apply --paper-font-display4;
-      }
+        div {
+          color: white;
+          @apply --layout-horizontal;
+          @apply --layout-center-center;
+          @apply --paper-font-display4;
+        }
 
-      div:nth-child(1) {
-        background: var(--paper-red-500);
-      }
+        div:nth-child(1) {
+          background: var(--paper-red-500);
+        }
 
-      div:nth-child(2) {
-        background: var(--paper-blue-500);
-      }
+        div:nth-child(2) {
+          background: var(--paper-blue-500);
+        }
 
-      div:nth-child(3) {
-        background: var(--paper-orange-500);
-      }
+        div:nth-child(3) {
+          background: var(--paper-orange-500);
+        }
 
-      div:nth-child(4) {
-        background: var(--paper-green-500);
-      }
+        div:nth-child(4) {
+          background: var(--paper-green-500);
+        }
 
-      div:nth-child(5) {
-        background: var(--paper-purple-500);
-      }
-
-    </style>
+        div:nth-child(5) {
+          background: var(--paper-purple-500);
+        }
+      </style>
+    </custom-style>
   </head>
   <body>
     <template is="dom-bind">

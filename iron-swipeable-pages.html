@@ -41,7 +41,6 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 -->
 
 <dom-module id="iron-swipeable-pages">
-
   <template>
     <style>
       :host {
@@ -62,7 +61,6 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
     </style>
     <slot></slot>
   </template>
-
   <script>
     (function() {
       Polymer({
@@ -151,6 +149,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
            * This option could be used for example to check in `on-selected-changed` that
            * the selection was initiated by gesture or via data-binding or programmatically
            */
+          // TODO PG: turn into private...
           isGesture: {
             type: Boolean,
             value: false
