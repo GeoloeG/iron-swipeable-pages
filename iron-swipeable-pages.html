@@ -163,11 +163,14 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
 
         },
 
+        observers: [
+          '_onFallbackSelectionChange(fallbackSelection)'
+        ],
+
         listeners: {
           'iron-items-changed': '_onItemsChanged',
           'iron-deselect': '_onIronDeselectItem',
           'iron-select': '_onIronSelectItem',
-          'dom-change': '_onDomChange',
           'track': '_onTrack',
         },
 
@@ -202,6 +205,15 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
               return;
             this.unlisten(page, 'webkitTransitionEnd', '_onTransitionEnd');
             this.unlisten(page, 'transitionend', '_onTransitionEnd');
+        },
+
+        _onFallbackSelectionChange: function(event) {
+          if (!this.fallbackSelection) {
+            this.unlisten(this, 'dom-change', '_onDomChange');
+          }
+          else {
+            this.listen(this, 'dom-change', '_onDomChange');
+          }
         },
 
         _onDomChange: function(event) {
