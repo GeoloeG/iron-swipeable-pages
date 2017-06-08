@@ -32,8 +32,7 @@
   "homepage": "https://github.com/GeoloeG/iron-swipeable-pages/",
   "ignore": [
     "/.*",
-    "/test/",
-    "/demo/"
+    "/test/"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0-rc.7",
