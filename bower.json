@@ -40,17 +40,17 @@
     "iron-selector": "PolymerElements/iron-selector#2.0-preview"
   },
   "devDependencies": {
-    "app-route": "PolymerElements/app-route#2.0-preview",
-    "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0-preview",
-    "iron-test-helpers": "PolymerElements/iron-test-helpers#2.0-preview",
-    "paper-checkbox": "PolymerElements/paper-checkbox#2.0-preview",
-    "paper-drawer-panel": "PolymerElements/paper-drawer-panel#2.0-preview",
-    "paper-input": "PolymerElements/paper-input#2.0-preview",
-    "paper-tabs": "PolymerElements/paper-tabs#2.0-preview",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#v1.0.0-rc.9",
-    "web-component-tester": "Polymer/web-component-tester#6.0.0-prerelease.9",
-    "dom-repeat-n": "GeoloeG/dom-repeat-n#2.0-preview"
+    "app-route": "PolymerElements/app-route#^2.0.0",
+    "dom-repeat-n": "GeoloeG/dom-repeat-n#^2.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^2.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#^2.0.0",
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.0",
+    "paper-drawer-panel": "PolymerElements/paper-drawer-panel#^2.0.0",
+    "paper-input": "PolymerElements/paper-input#^2.0.0",
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0"
   },
   "variants": {
     "1.x": {
