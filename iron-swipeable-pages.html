@@ -168,10 +168,18 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           /**
            * This option could be used to disable swiping.
            */
-          disabled: {
+          swipeDisabled: {
             type: Boolean,
             value: false
           },
+
+          /**
+           * This option could also be used to disable swiping. (Warning : it could have side effect on IE, like disable scroll)
+           */
+          disabled: {
+            type: Boolean,
+            value: false
+          }
 
         },
 
@@ -240,7 +248,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         _onTrack: function(event) {
           var track = event.detail;
 
-          if (this.disabled || (this.noCycle && !this._canCycle(track))) {
+          if (this._isSwipeDisabled() || (this.noCycle && !this._canCycle(track))) {
             return;
           }
 
@@ -261,6 +269,10 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           } else if (track.state === 'end' && this._swipeStarted) {
             this._trackEnd(track);
           }
+        },
+
+        _isSwipeDisabled: function() {
+          return this.disabled || this.swipeDisabled;
         },
 
         _trackStart: function(trackData) {
