@@ -546,7 +546,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         },
 
         _getOffsetWidth: function () {
-          this._offsetWidth || this.offsetWidth + (2 * this.padding);
+          this._offsetWidth = this._offsetWidth || this.offsetWidth + (2 * this.padding);
           return this._offsetWidth;
         },
 
