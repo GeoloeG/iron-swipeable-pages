@@ -27,10 +27,10 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "git://github.com/socceroos/iron-swipeable-pages.git"
+    "url": "git://github.com/GeoloeG/iron-swipeable-pages.git"
   },
   "license": "MIT",
-  "homepage": "https://github.com/socceroos/iron-swipeable-pages/",
+  "homepage": "https://github.com/GeoloeG/iron-swipeable-pages/",
   "ignore": [
     "/.*",
     "/test/"
