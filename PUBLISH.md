@@ -1,14 +1,14 @@
 ## Registering to Bower
 
-`bower register iron-swipeable-pages git://github.com/socceroos/iron-swipeable-pages.git`
+`bower register iron-swipeable-pages git://github.com/GeoloeG/iron-swipeable-pages.git`
 
 ## Registering to Gemnasium
 
-https://gemnasium.com/socceroos/
+https://gemnasium.com/GeoloeG/
 
 ## Registering to Waffle
 
-https://waffle.io/socceroos/iron-swipeable-pages
+https://waffle.io/GeoloeG/iron-swipeable-pages
 
 ## Registering to Travis
 
