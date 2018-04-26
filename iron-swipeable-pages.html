@@ -1,4 +1,5 @@
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/mixins/gesture-event-listeners.html">
 
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../iron-selector/iron-selectable.html">
@@ -11,14 +12,14 @@
       display: block;
       overflow-x: hidden;
       }
-      :host > ::slotted > * {
+      :host > ::slotted(*) {
         position: absolute;
         width: 100%;
         height: 100%;
         overflow-y: auto;
         will-change: left, transform;
       }
-      :host > ::slotted > :not(.iron-selected):not(.iron-swiping) {
+      :host > ::slotted(:not(.iron-selected):not(.iron-swiping)) {
         left: -100% !important;
       }
     </style>
@@ -36,7 +37,7 @@
      * @polymer
      * @extends {Polymer.Element}
      */
-    class IronSwipeablePages extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior, Polymer.IronSelectableBehavior], Polymer.Element) {
+    class IronSwipeablePages extends Polymer.GestureEventListeners(Polymer.mixinBehaviors([Polymer.IronResizableBehavior, Polymer.IronSelectableBehavior], Polymer.Element)) {
       /**
        * String providing the tag name to register the element under.
        */
@@ -186,11 +187,11 @@
       connectedCallback() {
         super.connectedCallback();
       
-        this.addEventListener('iron-resize', e => _onResize);
-        this.addEventListener('iron-items-changed', e => _onItemsChanged);
-        this.addEventListener('iron-deselect', e => _onIronDeselectItem);
-        this.addEventListener('iron-select', e => _onIronSelectItem);
-        this.addEventListener('track', e => _onTrack);
+        this.addEventListener('iron-resize', e => this._onResize(e));
+        this.addEventListener('iron-items-changed', e => this._onItemsChanged(e));
+        this.addEventListener('iron-deselect', e => this._onIronDeselectItem(e));
+        this.addEventListener('iron-select', e => this._onIronSelectItem(e));
+        Polymer.Gestures.addListener(this, 'track', e => this._onTrack(e));
       }
 
       /**
@@ -200,11 +201,11 @@
       disconnectedCallback() {
         super.disconnectedCallback();
       
-        this.removeEventListener('iron-resize', e => _onResize);
-        this.removeEventListener('iron-items-changed', e => _onItemsChanged);
-        this.removeEventListener('iron-deselect', e => _onIronDeselectItem);
-        this.removeEventListener('iron-select', e => _onIronSelectItem);
-        this.removeEventListener('track', e => _onTrack);
+        this.removeEventListener('iron-resize', e => this._onResize(e));
+        this.removeEventListener('iron-items-changed', e => this._onItemsChanged(e));
+        this.removeEventListener('iron-deselect', e => this._onIronDeselectItem(e));
+        this.removeEventListener('iron-select', e => this._onIronSelectItem(e));
+        this.removeEventListener('track', e => this._onTrack(e));
       }
 
       /**
