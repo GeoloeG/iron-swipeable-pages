@@ -179,6 +179,15 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
           disabled: {
             type: Boolean,
             value: false
+          },
+
+          /**
+           * This property allows other components to know the current swipe state. It could be useful to disable external component during swiping.
+           */
+          swipeStarted: {
+            type: Boolean,
+            value: false,
+            notify: true
           }
 
         },
@@ -263,10 +272,10 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             }
             this._trackStart(track);
 
-            this._swipeStarted = true;
-          } else if (track.state === 'track' && this._swipeStarted) {
+            this.swipeStarted = true;
+          } else if (track.state === 'track' && this.swipeStarted) {
             this._trackMove(track);
-          } else if (track.state === 'end' && this._swipeStarted) {
+          } else if (track.state === 'end' && this.swipeStarted) {
             this._trackEnd(track);
           }
         },
@@ -293,7 +302,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
         },
 
         _trackEnd: function(trackData) {
-          if (!this._swipeStarted) {
+          if (!this.swipeStarted) {
             return;
           }
           // Activate transition
@@ -523,7 +532,7 @@ Note: if you are using a `<paper-drawer-panel>`, it might be wise to use the fol
             this.transform('none', this._animatedPages[i]);
           }
           this._transitionRunning = false;
-          this._swipeStarted = false;
+          this.swipeStarted = false;
           this.isGesture = false;
         },
 
