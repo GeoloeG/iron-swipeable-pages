@@ -1,8 +1,9 @@
 language: node_js
 sudo: required
 before_script:
-  - npm install -g bower polylint web-component-tester
-  - bower install
+  - npm install
+  - npm install -g polylint
+  - npm install -g polymer-cli
   - polylint
 env:
   global:
@@ -10,12 +11,12 @@ env:
     - secure: nh65tvhnhOrK05qKvDJKMV7Jm9yiCoG1wFkP3ZnqOHix9Ny+KmcTa41Bl6NXQdvYaMTFtzS7lMZX5cqIziyKyGWHVN30LzGMHJNz12fhcMi3nJ84trhQGcu/9qR9yDv16q9ouGlcz1VxnDOHaRAHnIKjLIbhN3aJtMtZBbnWihA=
 node_js: stable
 addons:
-  firefox: '46.0'
+  chrome: stable
+  firefox: latest
   apt:
     sources:
       - google-chrome
     packages:
       - google-chrome-stable
-script:
-  - xvfb-run wct
+script: xvfb-run polymer test --module-resolution=node --npm
 dist: trusty

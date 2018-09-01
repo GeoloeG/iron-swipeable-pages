@@ -1,55 +1,61 @@
 <!doctype html>
 <html>
-  <head>
-    <title>iron-swipeable-pages demo: configurable</title>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+<head>
+  <title>iron-swipeable-pages demo: configurable</title>
 
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
-    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
-    <link rel="import" href="../../paper-checkbox/paper-checkbox.html">
-    <link rel="import" href="../../paper-tabs/paper-tab.html">
-    <link rel="import" href="../../paper-tabs/paper-tabs.html">
-    <link rel="import" href="../../paper-input/paper-input.html">
-    <link rel="import" href="../../paper-styles/typography.html">
-    <link rel="import" href="../../paper-styles/color.html">
-    <link rel="import" href="../../dom-repeat-n/dom-repeat-n.html">
+  <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 
-    <link rel="import" href="../iron-swipeable-pages.html">
+  <script type="module">
+    import '../iron-swipeable-pages.js';
+    import '@polymer/iron-flex-layout/iron-flex-layout.js';
+    import '@polymer/paper-checkbox/paper-checkbox.js';
+    import '@polymer/paper-tabs/paper-tabs.js';
+    import '@polymer/paper-tabs/paper-tab.js';
+    import '@polymer/paper-input/paper-input.js';
+    import '@polymer/paper-styles/typography.js';
+    import '@polymer/paper-styles/color.js';
+  </script>
 
-    <style is="custom-style">
+  <custom-style>
+    <style>
       body {
         overflow: hidden;
-        @apply(--layout-fullbleed);
-        @apply(--layout-vertical);
+        @apply --layout-fullbleed;
+        @apply --layout-vertical;
       }
 
       iron-swipeable-pages {
-        @apply(--layout-flex);
+        @apply --layout-flex;
       }
 
-      iron-swipeable-pages > * {
-        -webkit-user-select: none;  /* Chrome all / Safari all */
-        -moz-user-select: none;     /* Firefox all */
-        -ms-user-select: none;      /* IE 10+ */
-        user-select: none;          /* Likely future */
+      iron-swipeable-pages>* {
+        -webkit-user-select: none;
+        /* Chrome all / Safari all */
+        -moz-user-select: none;
+        /* Firefox all */
+        -ms-user-select: none;
+        /* IE 10+ */
+        user-select: none;
+        /* Likely future */
         cursor: default;
         height: 100%;
       }
 
       div {
         color: white;
-        @apply(--layout-horizontal);
-        @apply(--layout-center-center);
-        @apply(--paper-font-display4);
+        @apply --layout-horizontal;
+        @apply --layout-center-center;
+        @apply --paper-font-display4;
       }
 
       div.checkboxContainer {
-        background: var(--paper-grey-500)!important;
-        @apply(--paper-font-display1);
+        background: var(--paper-grey-500) !important;
+        @apply --paper-font-display1;
       }
 
       div:nth-child(5n+1) {
@@ -71,56 +77,69 @@
       div:nth-child(5n) {
         background: var(--paper-purple-500);
       }
-
     </style>
-  </head>
-  <body>
-    <template is="dom-bind">
+  </custom-style>
+</head>
 
+<body>
+  <dom-bind>
+    <template>
       <paper-input label="Number of pages" type="number" value="{{initCount}}" on-value-changed="_rebootArray"></paper-input>
 
       <paper-tabs selected="{{selected}}" scrollable>
         <paper-tab>Begin Tab</paper-tab>
-        <template is="dom-repeat" items="[[pageArray]]" as="page">
-          <template is="dom-if" if="[[page.checked]]">
-            <paper-tab>Tab [[index]]</paper-tab>
+        <dom-repeat items="[[pageArray]]" as="page">
+          <template>
+            <dom-if if="[[page.checked]]">
+              <template>
+                <paper-tab>Tab [[index]]</paper-tab>
+              </template>
+            </dom-if>
           </template>
-        </template>
+        </dom-repeat>
         <paper-tab>End Tab</paper-tab>
       </paper-tabs>
       <iron-swipeable-pages selected="{{selected}}" threshold="0.1">
         <div>Begin Page</div>
-        <template is="dom-repeat" items="{{pageArray}}" as="page">
-          <template is="dom-if" if="[[page.checked]]">
-            <div>Page [[index]]</div>            
+        <dom-repeat items="{{pageArray}}" as="page">
+          <template>
+            <dom-if if="[[page.checked]]">
+              <template>
+                <div>Page [[index]]</div>
+              </template>
+            </dom-if>
           </template>
-        </template>
+        </dom-repeat>
         <div>End Page</div>
       </iron-swipeable-pages>
       <div class="checkboxContainer">
-        <template is="dom-repeat" items="{{pageArray}}" as="page">
-          <paper-checkbox checked="{{page.checked}}">Page [[index]]</paper-checkbox>
-        </template>
+        <dom-repeat items="{{pageArray}}" as="page">
+          <template>
+            <paper-checkbox checked="{{page.checked}}">Page [[index]]</paper-checkbox>
+          </template>
+        </dom-repeat>
       </div>
 
     </template>
-    <script>
+  </dom-bind>
+  <script>
 
-      var scope = document.querySelector('template[is="dom-bind"]');
-      scope.selected = 0;
-      scope.initCount = 0;
+    var scope = document.querySelector('dom-bind');
+    scope.selected = 0;
+    scope.initCount = 0;
+    scope.pageArray = [];
+
+    scope._computeCount = function (value) {
+      return Number(value);
+    }
+
+    scope._rebootArray = function (event) {
       scope.pageArray = [];
-
-      scope._computeCount = function(value) {
-        return Number(value);
+      for (var i = 0; i < Number(event.detail.value); i++) {
+        scope.push('pageArray', { checked: true });
       }
+    }
+  </script>
+</body>
 
-      scope._rebootArray = function(event) {
-        scope.pageArray = [];
-        for (var i=0; i < Number(event.detail.value); i++) {
-          scope.push('pageArray', {checked: true});
-        }
-      }
-    </script>
-  </body>
 </html>
